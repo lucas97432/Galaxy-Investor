@@ -1,269 +1,838 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Galaxy Investor | High-End Platform</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        :root {
-            --primary: #6366f1;
-            --accent: #a855f7;
-            --bg-dark: #020617;
-            --glass: rgba(15, 23, 42, 0.65);
-            --border: rgba(255, 255, 255, 0.1);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galaxy Investor — Accès</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        * { box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+    :root {
+      --gold: #f0c040;
+      --gold-dim: #a07820;
+      --blue-deep: #050d1a;
+      --blue-mid: #0a1a35;
+      --glass-bg: rgba(10, 25, 55, 0.55);
+      --glass-border: rgba(240, 192, 64, 0.18);
+      --glass-border-active: rgba(240, 192, 64, 0.6);
+      --text: #e8eaf6;
+      --text-dim: #7a90b8;
+      --error: #ff5f6d;
+      --success: #43e97b;
+    }
 
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background: var(--bg-dark);
-            color: white; overflow: hidden;
-            display: flex; justify-content: center; align-items: center;
-        }
+    html, body {
+      height: 100%;
+      background: var(--blue-deep);
+      font-family: 'Syne', sans-serif;
+      color: var(--text);
+      overflow: hidden;
+    }
 
-        /* --- ARRIÈRE-PLAN ANIMÉ (ÉTOILES) --- */
-        #canvas-stars {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
-        }
+    /* ── CANVAS ÉTOILES ── */
+    #starfield {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
 
-        /* --- CONTAINER FLUIDE --- */
-        .main-wrapper {
-            width: 100%; max-width: 400px; padding: 20px;
-            z-index: 10;
-        }
+    /* ── NÉBULEUSE FOND ── */
+    .nebula {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 30%, rgba(80, 30, 160, 0.35) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 35% at 80% 70%, rgba(20, 80, 180, 0.3) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 60% 20%, rgba(240, 100, 50, 0.12) 0%, transparent 60%);
+      pointer-events: none;
+    }
 
-        .card {
-            background: var(--glass);
-            backdrop-filter: blur(20px) saturate(160%);
-            -webkit-backdrop-filter: blur(20px) saturate(160%);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 40px 30px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: slideUp 0.6s ease-out;
-        }
+    /* ── WRAPPER PRINCIPAL ── */
+    .auth-wrapper {
+      position: relative;
+      z-index: 10;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    /* ── CARD GLASSMORPHISM ── */
+    .card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      padding: 44px 40px 36px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow:
+        0 0 0 1px rgba(240,192,64,0.06) inset,
+        0 32px 80px rgba(0,0,0,0.55),
+        0 0 60px rgba(80,30,160,0.15);
+      animation: cardIn 0.7s cubic-bezier(.22,1,.36,1) both;
+    }
 
-        .brand-header { text-align: center; margin-bottom: 30px; }
-        .brand-header h1 { 
-            margin: 0; font-size: 1.8rem; letter-spacing: 2px;
-            background: linear-gradient(to right, #fff, var(--primary));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(36px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
 
-        /* --- INPUTS & FORMS --- */
-        .input-group { margin-bottom: 20px; }
-        label { display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
-        
-        input {
-            width: 100%; padding: 15px; border-radius: 12px;
-            background: rgba(0, 0, 0, 0.3); border: 1px solid var(--border);
-            color: white; font-size: 1rem; transition: 0.3s;
-        }
+    /* ── LOGO ── */
+    .logo-zone {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .logo-icon {
+      font-size: 2.6rem;
+      display: block;
+      animation: orbit 8s linear infinite;
+    }
+    @keyframes orbit {
+      0%   { filter: drop-shadow(0 0 8px var(--gold)); }
+      50%  { filter: drop-shadow(0 0 24px var(--gold)); }
+      100% { filter: drop-shadow(0 0 8px var(--gold)); }
+    }
+    .logo-title {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900;
+      font-size: 1.35rem;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      text-shadow: 0 0 18px rgba(240,192,64,0.45);
+      margin-top: 6px;
+    }
+    .logo-sub {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
 
-        input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 15px rgba(99, 102, 241, 0.3); }
+    /* ── TABS ── */
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 28px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--glass-border);
+    }
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      font-family: 'Syne', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 11px 0;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .tab-btn.active {
+      background: rgba(240,192,64,0.12);
+      color: var(--gold);
+    }
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 10%; right: 10%;
+      height: 2px;
+      background: var(--gold);
+      border-radius: 2px;
+      box-shadow: 0 0 8px var(--gold);
+    }
 
-        .btn {
-            width: 100%; padding: 16px; border-radius: 12px; border: none;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: white; font-weight: bold; font-size: 1rem; cursor: pointer;
-            transition: 0.3s; box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
+    /* ── FORMULAIRES ── */
+    .form-panel { display: none; }
+    .form-panel.active { display: block; }
 
-        .btn:hover { transform: translateY(-2px); filter: brightness(1.2); }
-        .btn:active { transform: translateY(0); }
+    .field {
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .field label {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+    .field input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s;
+      -webkit-appearance: none;
+    }
+    .field input:focus {
+      border-color: var(--glass-border-active);
+      box-shadow: 0 0 0 3px rgba(240,192,64,0.08), 0 0 16px rgba(240,192,64,0.12);
+    }
+    .field input::placeholder { color: rgba(120,144,184,0.55); font-size: 0.85rem; }
 
-        .footer-link { text-align: center; margin-top: 20px; font-size: 0.9rem; color: #64748b; }
-        .footer-link span { color: var(--primary); cursor: pointer; font-weight: 600; }
+    .field-optional {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      float: right;
+      text-transform: none;
+      font-weight: 400;
+      opacity: 0.7;
+    }
 
-        .hidden { display: none; }
+    /* ── BOUTON PRINCIPAL ── */
+    .btn-primary {
+      width: 100%;
+      margin-top: 6px;
+      padding: 14px;
+      background: linear-gradient(135deg, #c89820 0%, #f0c040 50%, #c89820 100%);
+      border: none;
+      border-radius: 12px;
+      color: #050d1a;
+      font-family: 'Orbitron', monospace;
+      font-weight: 700;
+      font-size: 0.82rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent, rgba(255,255,255,0.25), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
+    }
+    .btn-primary:hover::before { transform: translateX(100%); }
+    .btn-primary:hover {
+      box-shadow: 0 0 28px rgba(240,192,64,0.5), 0 6px 20px rgba(0,0,0,0.4);
+      transform: translateY(-1px);
+    }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
 
-        /* OTP INPUTS */
-        .otp-container { display: flex; justify-content: center; gap: 10px; }
-        .otp-input { width: 100%; text-align: center; font-size: 1.5rem; font-weight: bold; }
+    /* ── OTP PANEL ── */
+    .otp-panel {
+      display: none;
+      text-align: center;
+      animation: fadeUp 0.4s ease both;
+    }
+    .otp-panel.visible { display: block; }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .otp-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+    .otp-desc {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+    .otp-desc span { color: var(--text); }
 
-        #status-msg {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            padding: 12px 24px; border-radius: 50px; font-size: 0.9rem;
-            display: none; z-index: 1000;
-        }
-    </style>
+    .otp-inputs {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 22px;
+    }
+    .otp-inputs input {
+      width: 46px; height: 56px;
+      text-align: center;
+      font-family: 'Orbitron', monospace;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--gold);
+      background: rgba(240,192,64,0.06);
+      border: 1.5px solid var(--glass-border);
+      border-radius: 10px;
+      outline: none;
+      transition: all 0.25s;
+      -webkit-appearance: none;
+    }
+    .otp-inputs input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 12px rgba(240,192,64,0.3);
+      background: rgba(240,192,64,0.1);
+    }
+    .otp-inputs input.filled {
+      border-color: rgba(240,192,64,0.5);
+    }
+
+    .otp-resend {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 12px;
+    }
+    .otp-resend button {
+      background: none;
+      border: none;
+      color: var(--gold);
+      cursor: pointer;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.75rem;
+      text-decoration: underline;
+      padding: 0;
+    }
+    .otp-resend button:disabled { opacity: 0.4; cursor: not-allowed; text-decoration: none; }
+
+    /* ── MESSAGES ── */
+    .msg {
+      padding: 10px 14px;
+      border-radius: 9px;
+      font-size: 0.8rem;
+      margin-top: 12px;
+      display: none;
+      animation: fadeUp 0.3s ease;
+      line-height: 1.4;
+    }
+    .msg.error { background: rgba(255,95,109,0.12); border: 1px solid rgba(255,95,109,0.3); color: var(--error); display: block; }
+    .msg.success { background: rgba(67,233,123,0.1); border: 1px solid rgba(67,233,123,0.3); color: var(--success); display: block; }
+
+    /* ── SPINNER ── */
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(5,13,26,0.3);
+      border-top-color: var(--blue-deep);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── FOOTER ── */
+    .card-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      letter-spacing: 0.05em;
+      line-height: 1.6;
+    }
+    .card-footer a { color: var(--gold-dim); text-decoration: none; }
+    .card-footer a:hover { color: var(--gold); }
+
+    /* ── PARTICULES FLOTTANTES ── */
+    .particle {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 2;
+      animation: float linear infinite;
+      opacity: 0;
+    }
+    @keyframes float {
+      0%   { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.6; }
+      90%  { opacity: 0.3; }
+      100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 480px) {
+      .card { padding: 32px 22px 28px; }
+      .otp-inputs input { width: 40px; height: 50px; font-size: 1.1rem; }
+    }
+
+    /* ── SUCCÈS OVERLAY ── */
+    .success-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(5,13,26,0.92);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      animation: fadeIn 0.4s ease;
+    }
+    .success-overlay.visible { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .success-icon { font-size: 4rem; margin-bottom: 16px; animation: pulse 1.5s ease infinite; }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px var(--gold)); }
+      50% { transform: scale(1.12); filter: drop-shadow(0 0 30px var(--gold)); }
+    }
+    .success-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.4rem;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+    .success-desc { color: var(--text-dim); font-size: 0.9rem; }
+  </style>
 </head>
 <body>
 
-    <canvas id="canvas-stars"></canvas>
+<!-- Fond étoiles -->
+<canvas id="starfield"></canvas>
+<div class="nebula"></div>
 
-    <div class="main-wrapper">
-        <div class="brand-header">
-            <h1>GALAXY INVESTOR</h1>
-        </div>
+<!-- Particules flottantes -->
+<div id="particles"></div>
 
-        <div id="view-login" class="card">
-            <h2>Connexion</h2>
-            <form onsubmit="doLogin(event)">
-                <div class="input-group">
-                    <label>Email</label>
-                    <input type="email" id="login-email" placeholder="nom@exemple.com" required autocomplete="username">
-                </div>
-                <div class="input-group">
-                    <label>Mot de passe</label>
-                    <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password">
-                </div>
-                <button type="submit" class="btn">ACCÉDER AU TERMINAL</button>
-            </form>
-            <div class="footer-link">Pas de compte ? <span onclick="switchView('register')">Créer un accès</span></div>
-        </div>
+<!-- Overlay succès -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-icon">🚀</div>
+  <div class="success-title">Bienvenue dans la Galaxie</div>
+  <div class="success-desc">Redirection vers votre tableau de bord...</div>
+</div>
 
-        <div id="view-register" class="card hidden">
-            <h2>Nouvel Accès</h2>
-            <form onsubmit="doRegister(event)">
-                <div class="input-group">
-                    <label>Email</label>
-                    <input type="email" id="reg-email" placeholder="email@test.com" required>
-                </div>
-                <div class="input-group">
-                    <label>Mot de passe</label>
-                    <input type="password" id="reg-password" placeholder="8+ caractères" required minlength="8">
-                </div>
-                <button type="submit" class="btn">CRÉER MON COMPTE</button>
-            </form>
-            <div class="footer-link">Déjà inscrit ? <span onclick="switchView('login')">Se connecter</span></div>
-        </div>
+<!-- CARD PRINCIPALE -->
+<div class="auth-wrapper">
+  <div class="card">
 
-        <div id="view-otp" class="card hidden">
-            <h2>Vérification</h2>
-            <p style="text-align:center; color:#94a3b8; font-size:0.8rem;">Entrez le code reçu par mail.</p>
-            <form onsubmit="doVerifyOTP(event)">
-                <div class="input-group">
-                    <input type="text" id="otp-code" placeholder="Code à 6 chiffres" maxlength="6" class="otp-input" required>
-                </div>
-                <button type="submit" class="btn">VÉRIFIER LE CODE</button>
-            </form>
-            <div class="footer-link"><span onclick="switchView('login')">Retour</span></div>
-        </div>
+    <!-- Logo -->
+    <div class="logo-zone">
+      <span class="logo-icon">🪐</span>
+      <div class="logo-title">GALAXY INVESTOR</div>
+      <div class="logo-sub">Votre empire galactique commence ici</div>
     </div>
 
-    <div id="status-msg"></div>
+    <!-- Tabs -->
+    <div class="tabs" id="tabs">
+      <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">Connexion</button>
+      <button class="tab-btn" id="tabSignup" onclick="switchTab('signup')">Inscription</button>
+    </div>
 
-    <script>
-        // --- CONFIGURATION CONNECTÉE ---
-        const SUPABASE_URL = "https://fwkisfdoqazapjdnhmwb.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_MSJBTK0-UaBjtoeQTgJ1XQ_pvS3NM_h";
-        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    <!-- ═══ FORMULAIRE CONNEXION ═══ -->
+    <div class="form-panel active" id="panelLogin">
+      <div class="field">
+        <label>Adresse e-mail</label>
+        <input type="email" id="loginEmail" placeholder="pilote@galaxie.io" autocomplete="email" />
+      </div>
+      <div class="field">
+        <label>Mot de passe</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+      <div class="msg" id="loginMsg"></div>
+      <button class="btn-primary" id="loginBtn" onclick="handleLogin()">
+        Entrer dans la galaxie
+      </button>
+    </div>
 
-        // --- GESTION DE L'AFFICHAGE ---
-        function switchView(view) {
-            document.querySelectorAll('.card').forEach(c => c.classList.add('hidden'));
-            document.getElementById('view-' + view).classList.remove('hidden');
-        }
+    <!-- ═══ FORMULAIRE INSCRIPTION ═══ -->
+    <div class="form-panel" id="panelSignup">
+      <div class="field">
+        <label>Adresse e-mail</label>
+        <input type="email" id="signupEmail" placeholder="pilote@galaxie.io" autocomplete="email" />
+      </div>
+      <div class="field">
+        <label>Mot de passe</label>
+        <input type="password" id="signupPassword" placeholder="8 caractères minimum" autocomplete="new-password" />
+      </div>
+      <div class="field">
+        <label>Confirmer le mot de passe</label>
+        <input type="password" id="signupConfirm" placeholder="Répétez votre mot de passe" autocomplete="new-password" />
+      </div>
+      <div class="field">
+        <label>Code de parrainage <span class="field-optional">Optionnel</span></label>
+        <input type="text" id="referralCode" placeholder="Ex : GAL-XXXX" autocomplete="off" />
+      </div>
+      <div class="msg" id="signupMsg"></div>
+      <button class="btn-primary" id="signupBtn" onclick="handleSignup()">
+        Créer mon compte
+      </button>
+    </div>
 
-        function notify(msg, isError = false) {
-            const el = document.getElementById('status-msg');
-            el.textContent = msg;
-            el.style.display = 'block';
-            el.style.background = isError ? '#ef4444' : '#10b981';
-            setTimeout(() => el.style.display = 'none', 4000);
-        }
+    <!-- ═══ PANNEAU OTP ═══ -->
+    <div class="otp-panel" id="otpPanel">
+      <div class="otp-title">🔐 Vérification galactique</div>
+      <div class="otp-desc">
+        Un code à 6 chiffres a été envoyé à<br>
+        <span id="otpEmail">votre adresse e-mail</span>
+      </div>
+      <div class="otp-inputs" id="otpInputs">
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+        <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+      </div>
+      <div class="msg" id="otpMsg"></div>
+      <button class="btn-primary" id="otpBtn" onclick="handleOTP()">
+        Valider le code
+      </button>
+      <div class="otp-resend">
+        Pas reçu ? <button id="resendBtn" onclick="resendOTP()" disabled>Renvoyer</button>
+        <span id="resendTimer"></span>
+      </div>
+    </div>
 
-        // --- LOGIQUE AUTHENTIFICATION ---
-        let currentEmail = "";
+    <!-- Footer -->
+    <div class="card-footer">
+      Plateforme sécurisée · Données chiffrées<br>
+      <a href="#">Conditions d'utilisation</a> · <a href="#">Politique de confidentialité</a>
+    </div>
 
-        async function doRegister(e) {
-            e.preventDefault();
-            currentEmail = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-password').value;
-            
-            const { data, error } = await sb.auth.signUp({ 
-                email: currentEmail, 
-                password: pass 
-            });
+  </div>
+</div>
 
-            if (error) notify(error.message, true);
-            else {
-                notify("Inscription réussie ! Vérifiez vos mails.");
-                switchView('otp'); // On passe à la vérification
-            }
-        }
+<!-- ═══════════════════════════════════════ -->
+<!-- SCRIPT PRINCIPAL                        -->
+<!-- ═══════════════════════════════════════ -->
+<script>
+// ── CONFIG SUPABASE ──────────────────────────────────────────
+const SUPABASE_URL  = 'https://fwkisfdoqazapjdnhmwb.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_MSJBTK0-UaBjtoeQTgJ1XQ_pvS3NM_h';
 
-        async function doLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-password').value;
-            
-            const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+// Headers communs pour toutes les requêtes Supabase
+const sbHeaders = {
+  'Content-Type': 'application/json',
+  'apikey': SUPABASE_ANON,
+  'Authorization': `Bearer ${SUPABASE_ANON}`
+};
 
-            if (error) notify("Identifiants invalides", true);
-            else {
-                notify("Connexion réussie ! Bienvenue.");
-                // ICI: Redirection vers ton dashboard
-            }
-        }
+// Appel générique à l'API Supabase Auth
+async function sbAuth(endpoint, body) {
+  const res = await fetch(`${SUPABASE_URL}/auth/v1/${endpoint}`, {
+    method: 'POST',
+    headers: sbHeaders,
+    body: JSON.stringify(body)
+  });
+  return res.json();
+}
 
-        async function doVerifyOTP(e) {
-            e.preventDefault();
-            const token = document.getElementById('otp-code').value;
-            
-            const { data, error } = await sb.auth.verifyOtp({
-                email: currentEmail,
-                token: token,
-                type: 'signup'
-            });
+// ── ÉTAT LOCAL ────────────────────────────────────────────────
+let currentEmail = '';
+let resendInterval = null;
 
-            if (error) notify("Code incorrect ou expiré", true);
-            else {
-                notify("Compte validé ! Connectez-vous.");
-                switchView('login');
-            }
-        }
+// ── CANVAS ÉTOILES ────────────────────────────────────────────
+(function initStars() {
+  const canvas = document.getElementById('starfield');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
 
-        // --- ANIMATION ARRIÈRE-PLAN (PARTICULES) ---
-        const canvas = document.getElementById('canvas-stars');
-        const ctx = canvas.getContext('2d');
-        let stars = [];
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
 
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
+  function createStars() {
+    stars = [];
+    const count = Math.floor((canvas.width * canvas.height) / 3200);
+    for (let i = 0; i < count; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.5 + 0.2,
+        a: Math.random(),
+        speed: Math.random() * 0.003 + 0.001,
+        phase: Math.random() * Math.PI * 2
+      });
+    }
+  }
+  createStars();
 
-        class Star {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2;
-                this.speed = Math.random() * 0.5;
-            }
-            update() {
-                this.y += this.speed;
-                if (this.y > canvas.height) this.y = 0;
-            }
-            draw() {
-                ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    frame++;
+    stars.forEach(s => {
+      s.a = 0.3 + 0.7 * Math.abs(Math.sin(frame * s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255, 240, 200, ${s.a})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
 
-        function initStars() {
-            stars = [];
-            for (let i = 0; i < 150; i++) stars.push(new Star());
-        }
+// ── PARTICULES FLOTTANTES ─────────────────────────────────────
+(function initParticles() {
+  const container = document.getElementById('particles');
+  const colors = ['#f0c040', '#7060f0', '#4090f0', '#f06040'];
+  for (let i = 0; i < 14; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 4 + 2;
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      animation-duration:${12+Math.random()*18}s;
+      animation-delay:${Math.random()*15}s;
+      opacity:0;
+      box-shadow:0 0 ${size*3}px currentColor;
+    `;
+    container.appendChild(p);
+  }
+})();
 
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            stars.forEach(s => { s.update(); s.draw(); });
-            requestAnimationFrame(animate);
-        }
+// ── OTP INPUTS : navigation auto ─────────────────────────────
+document.querySelectorAll('#otpInputs input').forEach((inp, idx, arr) => {
+  inp.addEventListener('input', e => {
+    const val = e.target.value.replace(/\D/g, '');
+    e.target.value = val;
+    if (val.length === 1) {
+      e.target.classList.add('filled');
+      if (idx < arr.length - 1) arr[idx + 1].focus();
+    }
+    // Auto-submit si tous remplis
+    if ([...arr].every(i => i.value.length === 1)) {
+      setTimeout(handleOTP, 300);
+    }
+  });
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+      arr[idx - 1].value = '';
+      arr[idx - 1].classList.remove('filled');
+      arr[idx - 1].focus();
+    }
+  });
+  inp.addEventListener('paste', e => {
+    e.preventDefault();
+    const pasted = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6);
+    [...arr].forEach((input, i) => {
+      input.value = pasted[i] || '';
+      if (pasted[i]) input.classList.add('filled');
+      else input.classList.remove('filled');
+    });
+    if (pasted.length === 6) setTimeout(handleOTP, 300);
+  });
+});
 
-        window.addEventListener('resize', resize);
-        resize();
-        initStars();
-        animate();
-    </script>
+// ── HELPERS UI ────────────────────────────────────────────────
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.className = `msg ${type}`;
+  el.textContent = text;
+}
+function hideMsg(id) {
+  const el = document.getElementById(id);
+  el.className = 'msg';
+}
+function setLoading(btnId, loading, label) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  btn.innerHTML = loading
+    ? `<span class="spinner"></span>Chargement...`
+    : label;
+}
+
+function switchTab(tab) {
+  ['Login','Signup'].forEach(t => {
+    document.getElementById(`tab${t}`).classList.remove('active');
+    document.getElementById(`panel${t}`).classList.remove('active');
+  });
+  document.getElementById(`tab${tab.charAt(0).toUpperCase()+tab.slice(1)}`).classList.add('active');
+  document.getElementById(`panel${tab.charAt(0).toUpperCase()+tab.slice(1)}`).classList.add('active');
+  hideMsg('loginMsg'); hideMsg('signupMsg');
+}
+
+function showOTPPanel(email) {
+  currentEmail = email;
+  document.getElementById('otpEmail').textContent = email;
+  document.getElementById('panelLogin').classList.remove('active');
+  document.getElementById('panelSignup').classList.remove('active');
+  document.getElementById('tabs').style.display = 'none';
+  document.getElementById('otpPanel').classList.add('visible');
+  document.querySelectorAll('#otpInputs input')[0].focus();
+  startResendTimer(60);
+}
+
+function startResendTimer(seconds) {
+  clearInterval(resendInterval);
+  const btn = document.getElementById('resendBtn');
+  const timer = document.getElementById('resendTimer');
+  btn.disabled = true;
+  let s = seconds;
+  timer.textContent = ` (${s}s)`;
+  resendInterval = setInterval(() => {
+    s--;
+    timer.textContent = s > 0 ? ` (${s}s)` : '';
+    if (s <= 0) {
+      clearInterval(resendInterval);
+      btn.disabled = false;
+    }
+  }, 1000);
+}
+
+function triggerSuccess() {
+  document.getElementById('successOverlay').classList.add('visible');
+  // Ici vous pouvez rediriger vers le dashboard :
+  // setTimeout(() => { window.location.href = '/dashboard.html'; }, 2500);
+}
+
+// ── INSCRIPTION ───────────────────────────────────────────────
+async function handleSignup() {
+  hideMsg('signupMsg');
+  const email    = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  const confirm  = document.getElementById('signupConfirm').value;
+  const referral = document.getElementById('referralCode').value.trim();
+
+  if (!email || !password) return showMsg('signupMsg', '⚠️ E-mail et mot de passe requis.', 'error');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showMsg('signupMsg', '⚠️ Adresse e-mail invalide.', 'error');
+  if (password.length < 8) return showMsg('signupMsg', '⚠️ Mot de passe trop court (8 caractères minimum).', 'error');
+  if (password !== confirm) return showMsg('signupMsg', '⚠️ Les mots de passe ne correspondent pas.', 'error');
+
+  setLoading('signupBtn', true, 'Créer mon compte');
+
+  try {
+    const data = await sbAuth('signup', {
+      email,
+      password,
+      options: {
+        data: { referral_code: referral || null },
+        emailRedirectTo: window.location.href
+      }
+    });
+
+    if (data.error) {
+      const errMap = {
+        'User already registered': '⚠️ Cet e-mail est déjà utilisé. Connectez-vous.',
+        'Password should be at least 6 characters': '⚠️ Mot de passe trop court.',
+      };
+      showMsg('signupMsg', errMap[data.error.message] || `❌ ${data.error.message}`, 'error');
+    } else {
+      showMsg('signupMsg', '✅ Compte créé ! Vérification en cours...', 'success');
+      setTimeout(() => showOTPPanel(email), 800);
+    }
+  } catch {
+    showMsg('signupMsg', '❌ Erreur réseau. Vérifiez votre connexion.', 'error');
+  } finally {
+    setLoading('signupBtn', false, 'Créer mon compte');
+  }
+}
+
+// ── CONNEXION ────────────────────────────────────────────────
+async function handleLogin() {
+  hideMsg('loginMsg');
+  const email    = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  if (!email || !password) return showMsg('loginMsg', '⚠️ Renseignez votre e-mail et mot de passe.', 'error');
+
+  setLoading('loginBtn', true, 'Entrer dans la galaxie');
+
+  try {
+    const data = await sbAuth('token?grant_type=password', { email, password });
+
+    if (data.error) {
+      const errMap = {
+        'Invalid login credentials': '❌ E-mail ou mot de passe incorrect.',
+        'Email not confirmed': '📧 E-mail non vérifié. Vérifiez votre boîte mail.',
+      };
+      showMsg('loginMsg', errMap[data.error.message] || `❌ ${data.error.message}`, 'error');
+    } else {
+      // Stocker le token de session
+      if (data.access_token) {
+        localStorage.setItem('gi_token', data.access_token);
+        localStorage.setItem('gi_refresh', data.refresh_token);
+      }
+      showMsg('loginMsg', '✅ Connexion réussie !', 'success');
+      setTimeout(triggerSuccess, 800);
+    }
+  } catch {
+    showMsg('loginMsg', '❌ Erreur réseau. Vérifiez votre connexion.', 'error');
+  } finally {
+    setLoading('loginBtn', false, 'Entrer dans la galaxie');
+  }
+}
+
+// ── VÉRIFICATION OTP ─────────────────────────────────────────
+async function handleOTP() {
+  hideMsg('otpMsg');
+  const inputs = document.querySelectorAll('#otpInputs input');
+  const token  = [...inputs].map(i => i.value).join('');
+
+  if (token.length !== 6) return showMsg('otpMsg', '⚠️ Entrez les 6 chiffres du code.', 'error');
+
+  setLoading('otpBtn', true, 'Valider le code');
+
+  try {
+    const data = await sbAuth('verify', {
+      type: 'signup',
+      email: currentEmail,
+      token
+    });
+
+    if (data.error) {
+      const errMap = {
+        'Token has expired or is invalid': '❌ Code expiré ou invalide. Renvoyez-en un nouveau.',
+        'OTP expired': '❌ Code expiré. Cliquez sur "Renvoyer".',
+      };
+      showMsg('otpMsg', errMap[data.error.message] || `❌ ${data.error.message}`, 'error');
+      inputs.forEach(i => { i.value = ''; i.classList.remove('filled'); });
+      inputs[0].focus();
+    } else {
+      if (data.access_token) {
+        localStorage.setItem('gi_token', data.access_token);
+        localStorage.setItem('gi_refresh', data.refresh_token);
+      }
+      showMsg('otpMsg', '✅ Identité vérifiée !', 'success');
+      setTimeout(triggerSuccess, 700);
+    }
+  } catch {
+    showMsg('otpMsg', '❌ Erreur réseau. Réessayez.', 'error');
+  } finally {
+    setLoading('otpBtn', false, 'Valider le code');
+  }
+}
+
+// ── RENVOYER OTP ──────────────────────────────────────────────
+async function resendOTP() {
+  document.getElementById('resendBtn').disabled = true;
+  try {
+    await sbAuth('resend', { type: 'signup', email: currentEmail });
+    showMsg('otpMsg', '📧 Nouveau code envoyé !', 'success');
+    startResendTimer(60);
+  } catch {
+    showMsg('otpMsg', '❌ Impossible de renvoyer le code.', 'error');
+    document.getElementById('resendBtn').disabled = false;
+  }
+}
+
+// ── ENTER KEY SUPPORT ─────────────────────────────────────────
+document.getElementById('loginPassword').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleLogin();
+});
+document.getElementById('signupConfirm').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleSignup();
+});
+document.getElementById('referralCode').addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleSignup();
+});
+</script>
 </body>
 </html>

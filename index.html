@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galaxy Investor - Platform</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* Design Pro Galaxy */
+        :root { --primary: #6366f1; --bg: #0f172a; --glass: rgba(255, 255, 255, 0.05); }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: #0b0f1a; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .card { background: var(--glass); backdrop-filter: blur(15px); padding: 2rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); width: 90%; max-width: 380px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        input { width: 100%; padding: 14px; margin: 10px 0; background: rgba(0,0,0,0.3); border: 1px solid #334155; border-radius: 10px; color: white; box-sizing: border-box; }
+        .btn { width: 100%; padding: 14px; background: var(--primary); border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .link { text-align: center; font-size: 0.8rem; color: #94a3b8; cursor: pointer; margin-top: 15px; text-decoration: underline; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div id="auth-form">
+        <h2 id="title">Connexion</h2>
+        <input type="email" id="email" placeholder="Email" autocomplete="username">
+        <input type="password" id="password" placeholder="Mot de passe" autocomplete="current-password">
+        
+        <div id="register-fields" class="hidden">
+            <input type="text" id="referral" placeholder="Code Parrainage (Optionnel)">
+        </div>
+
+        <button class="btn" id="main-btn" onclick="handleAuth()">Se connecter</button>
+        <p class="link" id="toggle-link" onclick="toggleMode()">Pas encore membre ? Créer un compte</p>
+    </div>
+</div>
+
+<script>
+    // Configuration - REMPLACE AVEC TES CODES SUPABASE
+    const SUPABASE_URL = https://fwkisfdoqazapjdnhmwb.supabase.co
+;
+    const SUPABASE_KEY = sb_publishable_MSJBTK0-UaBjtoeQTgJ1XQ_pvS3NM_h;
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    let isLogin = true;
+
+    function toggleMode() {
+        isLogin = !isLogin;
+        document.getElementById('title').innerText = isLogin ? "Connexion" : "Inscription";
+        document.getElementById('main-btn').innerText = isLogin ? "Se connecter" : "S'inscrire";
+        document.getElementById('toggle-link').innerText = isLogin ? "Pas encore membre ? Créer un compte" : "Déjà membre ? Se connecter";
+        document.getElementById('register-fields').classList.toggle('hidden');
+    }
+
+    async function handleAuth() {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        if (isLogin) {
+            // CONNEXION RÉELLE
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) alert("Erreur: " + error.message);
+            else alert("Bienvenue ! Redirection...");
+        } else {
+            // INSCRIPTION RÉELLE (Envoie un mail auto)
+            const { data, error } = await supabase.auth.signUp({ 
+                email, 
+                password,
+                options: { data: { referral: document.getElementById('referral').value } }
+            });
+            if (error) alert("Erreur: " + error.message);
+            else alert("Succès ! Vérifie tes mails pour confirmer ton compte.");
+        }
+    }
+</script>
+</body>
+</html>

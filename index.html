@@ -2,555 +2,1371 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Galaxy Investor — Accès</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<meta name="theme-color" content="#030712"/>
+<meta name="description" content="Galaxy Investor — Plateforme d'investissement galactique"/>
+<title>Galaxy Investor 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
+/* ═══════════════════════════════════════════════════
+   RESET & VARIABLES
+═══════════════════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --g:#e8b94f;--g2:#f5d070;--g3:#7a5500;
-  --bg:#060a12;--card:rgba(10,16,28,0.85);
-  --b:rgba(232,185,79,0.14);--bon:rgba(232,185,79,0.6);
-  --t:#cdd8ee;--dim:#4a6080;
-  --red:#e05060;--green:#30c880;
+  /* Palette dorée */
+  --g1:#f5c842;--g2:#e8a820;--g3:#fde98a;--g4:#7a5200;
+  /* Fond spatial */
+  --bg:#030712;--bg2:#060d1e;--bg3:#0a1428;
+  /* Glassmorphism */
+  --glass:rgba(8,16,32,0.78);--glass2:rgba(12,22,42,0.6);
+  --border:rgba(245,200,66,0.12);--border2:rgba(245,200,66,0.55);
+  --border3:rgba(245,200,66,0.08);
+  /* Texte */
+  --t1:#e8eeff;--t2:#8aa0c0;--t3:#3a5070;
+  /* États */
+  --red:#f04060;--red2:rgba(240,64,96,0.12);--red3:rgba(240,64,96,0.3);
+  --green:#28d888;--green2:rgba(40,216,136,0.1);--green3:rgba(40,216,136,0.28);
+  /* Rayons */
+  --r1:14px;--r2:20px;--r3:26px;
 }
-html,body{height:100%;background:var(--bg);font-family:'Inter',sans-serif;color:var(--t);overflow:hidden}
-canvas{position:fixed;inset:0;z-index:0}
-.nb{position:fixed;inset:0;z-index:1;pointer-events:none;
+
+html,body{
+  height:100%;
+  background:var(--bg);
+  font-family:'Outfit',sans-serif;
+  color:var(--t1);
+  overflow:hidden;
+  cursor:default;
+}
+
+/* ═══════════════════════════════════════════════════
+   FOND ANIMÉ — CANVAS + NÉBULEUSES
+═══════════════════════════════════════════════════ */
+#cv{position:fixed;inset:0;z-index:0}
+
+.nebula{
+  position:fixed;inset:0;z-index:1;pointer-events:none;
   background:
-    radial-gradient(ellipse 50% 40% at 15% 20%,rgba(70,15,150,.22) 0%,transparent 70%),
-    radial-gradient(ellipse 45% 35% at 85% 80%,rgba(10,50,160,.18) 0%,transparent 70%)}
+    radial-gradient(ellipse 60% 50% at 8% 15%, rgba(100,20,220,.2) 0%,transparent 65%),
+    radial-gradient(ellipse 50% 40% at 92% 85%, rgba(10,60,200,.18) 0%,transparent 65%),
+    radial-gradient(ellipse 40% 35% at 60% 10%, rgba(220,80,20,.1) 0%,transparent 60%),
+    radial-gradient(ellipse 70% 60% at 45% 55%, rgba(3,7,18,.65) 0%,transparent 80%);
+  animation:nebshift 20s ease-in-out infinite alternate;
+}
+@keyframes nebshift{
+  0%{opacity:.8}50%{opacity:1}100%{opacity:.75}
+}
 
-/* WRAP */
-.w{position:relative;z-index:10;height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+/* Grille holographique subtile */
+.hologrid{
+  position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.025;
+  background-image:
+    linear-gradient(rgba(245,200,66,.8) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(245,200,66,.8) 1px,transparent 1px);
+  background-size:60px 60px;
+  animation:gridmove 30s linear infinite;
+}
+@keyframes gridmove{to{background-position:60px 60px}}
 
-/* CARD */
+/* Particules flottantes */
+.pt{
+  position:fixed;border-radius:50%;pointer-events:none;z-index:3;
+  animation:ptfloat linear infinite;opacity:0;
+}
+@keyframes ptfloat{
+  0%{transform:translateY(108vh) rotate(0deg) scale(0);opacity:0}
+  5%{opacity:.8;transform:translateY(95vh) rotate(30deg) scale(1)}
+  95%{opacity:.2}
+  100%{transform:translateY(-5vh) rotate(720deg) scale(.3);opacity:0}
+}
+
+/* ═══════════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════════ */
+.scene{
+  position:relative;z-index:10;
+  height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;
+}
+
+/* ═══════════════════════════════════════════════════
+   CARD PRINCIPALE
+═══════════════════════════════════════════════════ */
 .card{
-  background:var(--card);border:1px solid var(--b);border-radius:22px;
-  backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);
-  width:100%;max-width:420px;
-  box-shadow:0 30px 80px rgba(0,0,0,.7),0 0 0 1px rgba(232,185,79,.04) inset;
-  animation:up .7s cubic-bezier(.16,1,.3,1) both;overflow:hidden;
+  width:100%;max-width:440px;
+  background:var(--glass);
+  border:1px solid var(--border);
+  border-radius:var(--r3);
+  backdrop-filter:blur(48px) saturate(200%) brightness(.95);
+  -webkit-backdrop-filter:blur(48px) saturate(200%) brightness(.95);
+  overflow:hidden;
+  box-shadow:
+    0 0 0 1px rgba(245,200,66,.05) inset,
+    0 2px 0 rgba(245,200,66,.08) inset,
+    0 48px 120px rgba(0,0,0,.8),
+    0 0 100px rgba(80,20,160,.12),
+    0 0 200px rgba(80,20,160,.06);
+  animation:cardin .9s cubic-bezier(.16,1,.3,1) both;
+  position:relative;
 }
-@keyframes up{from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:none}}
-
-/* HEAD */
-.head{padding:30px 32px 22px;text-align:center;border-bottom:1px solid var(--b)}
-.ico{font-size:2.4rem;display:block;margin-bottom:8px;animation:glow 4s ease infinite}
-@keyframes glow{0%,100%{filter:drop-shadow(0 0 8px rgba(232,185,79,.5))}50%{filter:drop-shadow(0 0 22px rgba(232,185,79,.9))}}
-.brand{font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:900;letter-spacing:.14em;color:var(--g)}
-.sub{font-size:.62rem;color:var(--dim);letter-spacing:.28em;text-transform:uppercase;margin-top:3px}
-
-/* TABS */
-.tabs{display:flex;border-bottom:1px solid var(--b)}
-.tab{flex:1;padding:13px;background:none;border:none;color:var(--dim);
-  font-family:'Inter',sans-serif;font-size:.72rem;font-weight:500;letter-spacing:.12em;
-  text-transform:uppercase;cursor:pointer;transition:all .25s;position:relative}
-.tab::after{content:'';position:absolute;bottom:-1px;left:15%;right:15%;height:2px;
-  background:var(--g);border-radius:2px;box-shadow:0 0 8px var(--g);
-  transform:scaleX(0);transition:transform .3s}
-.tab.on{color:var(--g)}
-.tab.on::after{transform:scaleX(1)}
-
-/* BODY */
-.body{padding:26px 32px 30px}
-
-/* PANEL */
-.pan{display:none;animation:fi .25s ease both}
-.pan.on{display:block}
-@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
-/* FIELD */
-.fld{margin-bottom:14px}
-.lbl{display:flex;justify-content:space-between;align-items:center;
-  font-size:.64rem;letter-spacing:.15em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
-.lbl .op{font-size:.6rem;color:var(--g3);text-transform:none;letter-spacing:.05em}
-input.inp{
-  width:100%;padding:12px 14px;
-  background:rgba(255,255,255,.03);
-  border:1px solid var(--b);border-radius:10px;
-  color:var(--t);font-family:'Inter',sans-serif;font-size:.88rem;
-  outline:none;transition:all .2s;-webkit-appearance:none;
+@keyframes cardin{
+  from{opacity:0;transform:translateY(48px) scale(.95) rotateX(4deg)}
+  to{opacity:1;transform:none}
 }
-input.inp:focus{border-color:var(--bon);background:rgba(232,185,79,.03);
-  box-shadow:0 0 0 3px rgba(232,185,79,.07)}
-input.inp::placeholder{color:rgba(74,96,128,.5);font-size:.82rem}
 
-/* BTN */
-.btn{
-  width:100%;padding:13px;margin-top:8px;
-  background:linear-gradient(135deg,#a87200,#e8b94f 48%,#f5d070 52%,#a87200);
-  background-size:200%;border:none;border-radius:11px;
-  color:#040810;font-family:'Orbitron',monospace;font-weight:700;
-  font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;
-  cursor:pointer;transition:all .35s;position:relative;overflow:hidden;
+/* Ligne dorée top */
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent 0%,var(--g2) 30%,var(--g1) 50%,var(--g2) 70%,transparent 100%);
+  box-shadow:0 0 16px rgba(245,200,66,.3);
 }
-.btn:hover{background-position:right;box-shadow:0 0 28px rgba(232,185,79,.35),0 6px 20px rgba(0,0,0,.5);transform:translateY(-1px)}
-.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
-.shine{position:absolute;inset:0;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.2) 50%,transparent 62%);transform:translateX(-100%);transition:transform .5s}
-.btn:hover .shine{transform:translateX(100%)}
 
-/* MSG */
-.msg{border-radius:9px;font-size:.76rem;line-height:1.5;padding:10px 13px;margin-top:11px;display:none}
-.msg.e{background:rgba(224,80,96,.1);border:1px solid rgba(224,80,96,.25);color:var(--red);display:block}
-.msg.s{background:rgba(48,200,128,.08);border:1px solid rgba(48,200,128,.2);color:var(--green);display:block}
+/* ═══════════════════════════════════════════════════
+   HEADER CARD
+═══════════════════════════════════════════════════ */
+.card-header{
+  padding:34px 36px 24px;
+  text-align:center;
+  border-bottom:1px solid var(--border3);
+  position:relative;overflow:hidden;
+}
+.card-header::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(245,200,66,.06) 0%,transparent 70%);
+  pointer-events:none;
+}
 
-/* SPINNER */
-.sp{display:inline-block;width:13px;height:13px;border:2px solid rgba(4,8,16,.3);border-top-color:#040810;border-radius:50%;animation:r .7s linear infinite;vertical-align:middle;margin-right:6px}
-@keyframes r{to{transform:rotate(360deg)}}
+/* Orbite planète */
+.orbit-wrap{position:relative;display:inline-block;margin-bottom:12px}
+.planet-emoji{
+  font-size:2.8rem;display:block;
+  animation:planetfloat 5s ease-in-out infinite;
+  position:relative;z-index:2;
+}
+@keyframes planetfloat{
+  0%,100%{transform:translateY(0) rotate(-2deg);filter:drop-shadow(0 0 12px rgba(245,200,66,.6))}
+  50%{transform:translateY(-10px) rotate(2deg);filter:drop-shadow(0 0 30px rgba(245,200,66,1))}
+}
+.orbit-ring{
+  position:absolute;top:50%;left:50%;
+  width:74px;height:18px;
+  border:1.5px solid rgba(245,200,66,.3);
+  border-radius:50%;
+  transform:translate(-50%,-50%) rotateX(72deg);
+  animation:orbitring 6s linear infinite;
+  box-shadow:0 0 8px rgba(245,200,66,.2);
+}
+@keyframes orbitring{to{transform:translate(-50%,-50%) rotateX(72deg) rotateZ(360deg)}}
 
-/* OTP */
-.otp{display:none;animation:fi .35s ease both}
-.otp.on{display:block}
-.otp-head{text-align:center;margin-bottom:20px}
-.otp-ico{font-size:1.8rem;display:block;margin-bottom:8px}
-.otp-title{font-family:'Orbitron',monospace;font-size:.88rem;color:var(--g);font-weight:700;margin-bottom:5px}
-.otp-info{font-size:.75rem;color:var(--dim);line-height:1.6}
-.otp-info b{color:var(--t);font-weight:500}
+/* Texte logo */
+.logo-name{
+  font-family:'Orbitron',monospace;
+  font-weight:900;font-size:1.3rem;
+  letter-spacing:.16em;color:var(--g1);
+  text-shadow:0 0 30px rgba(245,200,66,.4),0 0 60px rgba(245,200,66,.15);
+  position:relative;z-index:2;
+}
+.logo-tag{
+  font-size:.6rem;color:var(--t3);
+  letter-spacing:.32em;text-transform:uppercase;
+  margin-top:4px;position:relative;z-index:2;
+}
+
+/* Indicateur sécurité */
+.security-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  margin-top:10px;padding:4px 10px;
+  background:rgba(40,216,136,.07);
+  border:1px solid rgba(40,216,136,.18);
+  border-radius:20px;font-size:.58rem;color:var(--green);
+  letter-spacing:.1em;text-transform:uppercase;
+  position:relative;z-index:2;
+}
+.security-dot{width:5px;height:5px;background:var(--green);border-radius:50%;animation:blink 2s ease infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ═══════════════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════════════ */
+.tabs{display:flex;border-bottom:1px solid var(--border3)}
+.tab-btn{
+  flex:1;padding:14px 0;background:none;border:none;
+  color:var(--t2);font-family:'Outfit',sans-serif;
+  font-size:.72rem;font-weight:500;letter-spacing:.12em;
+  text-transform:uppercase;cursor:pointer;
+  transition:all .3s;position:relative;overflow:hidden;
+}
+.tab-btn::before{
+  content:'';position:absolute;inset:0;
+  background:rgba(245,200,66,.04);
+  transform:scaleX(0);transition:transform .3s;
+}
+.tab-btn::after{
+  content:'';position:absolute;bottom:0;left:10%;right:10%;
+  height:2px;background:linear-gradient(90deg,transparent,var(--g1),transparent);
+  border-radius:2px;box-shadow:0 0 10px var(--g1);
+  transform:scaleX(0);transition:transform .3s;
+}
+.tab-btn.active{color:var(--g1)}
+.tab-btn.active::before{transform:scaleX(1)}
+.tab-btn.active::after{transform:scaleX(1)}
+
+/* ═══════════════════════════════════════════════════
+   BODY & PANELS
+═══════════════════════════════════════════════════ */
+.card-body{padding:28px 36px 32px}
+
+.panel{display:none}
+.panel.active{display:block;animation:panelin .3s ease both}
+@keyframes panelin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ═══════════════════════════════════════════════════
+   CHAMPS
+═══════════════════════════════════════════════════ */
+.field{margin-bottom:15px}
+.field-top{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:7px;
+}
+.field-label{
+  font-size:.62rem;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--t2);
+}
+.field-hint{font-size:.58rem;color:var(--g4);letter-spacing:.06em}
+
+.input-wrap{position:relative}
+.field-input{
+  width:100%;padding:13px 16px;
+  background:rgba(255,255,255,.025);
+  border:1px solid var(--border);
+  border-radius:var(--r1);
+  color:var(--t1);
+  font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:400;
+  outline:none;
+  transition:border-color .25s,box-shadow .25s,background .25s;
+  -webkit-appearance:none;
+}
+.field-input:focus{
+  border-color:var(--border2);
+  background:rgba(245,200,66,.025);
+  box-shadow:
+    0 0 0 3px rgba(245,200,66,.08),
+    0 0 20px rgba(245,200,66,.06);
+}
+.field-input::placeholder{color:rgba(58,80,112,.55);font-size:.82rem}
+.field-input.err{border-color:var(--red3);box-shadow:0 0 0 3px rgba(240,64,96,.06)}
+.field-input.good{border-color:rgba(40,216,136,.35)}
+
+/* Icône champ */
+.field-icon{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  font-size:.9rem;opacity:.4;transition:opacity .25s;pointer-events:none;
+}
+.field-input:focus~.field-icon{opacity:.8}
+
+/* ═══════════════════════════════════════════════════
+   BOUTON PRINCIPAL
+═══════════════════════════════════════════════════ */
+.btn-main{
+  width:100%;padding:14px;margin-top:10px;
+  background:linear-gradient(135deg,#8a6000 0%,#e8a820 30%,#f5c842 50%,#fde98a 65%,#e8a820 80%,#8a6000 100%);
+  background-size:300% 100%;
+  border:none;border-radius:var(--r1);
+  color:#020508;
+  font-family:'Orbitron',monospace;font-weight:800;
+  font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;
+  cursor:pointer;
+  transition:all .5s;
+  position:relative;overflow:hidden;
+  box-shadow:0 4px 20px rgba(0,0,0,.4);
+}
+.btn-main::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.22) 50%,transparent 65%);
+  transform:translateX(-100%);transition:transform .6s;
+}
+.btn-main:hover{
+  background-position:right center;
+  box-shadow:0 0 40px rgba(245,200,66,.4),0 8px 30px rgba(0,0,0,.6);
+  transform:translateY(-2px);
+}
+.btn-main:hover::before{transform:translateX(100%)}
+.btn-main:active{transform:translateY(0);box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.btn-main:disabled{
+  opacity:.35;cursor:not-allowed;
+  transform:none;box-shadow:none;
+}
+
+/* Spinner dans bouton */
+.spin{
+  display:inline-block;width:14px;height:14px;
+  border:2px solid rgba(2,5,8,.25);border-top-color:#020508;
+  border-radius:50%;animation:spinning .7s linear infinite;
+  vertical-align:middle;margin-right:8px;
+}
+@keyframes spinning{to{transform:rotate(360deg)}}
+
+/* ═══════════════════════════════════════════════════
+   MESSAGES
+═══════════════════════════════════════════════════ */
+.msg-box{
+  border-radius:var(--r1);font-size:.76rem;
+  line-height:1.55;padding:11px 14px;
+  margin-top:12px;display:none;
+  animation:panelin .3s ease;
+}
+.msg-box.error{background:var(--red2);border:1px solid var(--red3);color:var(--red);display:block}
+.msg-box.success{background:var(--green2);border:1px solid var(--green3);color:var(--green);display:block}
+
+/* ═══════════════════════════════════════════════════
+   PANNEAU OTP
+═══════════════════════════════════════════════════ */
+.otp-panel{display:none}
+.otp-panel.active{display:block;animation:panelin .4s ease both}
+
+.otp-hero{text-align:center;margin-bottom:22px}
+.otp-icon{font-size:2rem;display:block;margin-bottom:10px;animation:otppulse 2s ease infinite}
+@keyframes otppulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.otp-title{
+  font-family:'Orbitron',monospace;font-size:.88rem;font-weight:800;
+  color:var(--g1);letter-spacing:.08em;margin-bottom:6px;
+}
+.otp-desc{font-size:.76rem;color:var(--t2);line-height:1.65}
+.otp-desc strong{color:var(--t1);font-weight:500}
+
+/* Barre d'expiration */
+.exp-track{
+  height:3px;background:rgba(245,200,66,.08);
+  border-radius:3px;margin:16px 0;overflow:hidden;
+}
+.exp-fill{
+  height:100%;border-radius:3px;
+  background:linear-gradient(90deg,var(--g2),var(--g1),var(--g3));
+  box-shadow:0 0 8px var(--g1);
+  width:100%;
+  transition:width .5s linear, background .5s;
+}
 
 /* Cases OTP */
-.boxes{display:flex;gap:8px;justify-content:center;margin:18px 0 4px}
-.boxes input{
-  width:46px;height:56px;text-align:center;
-  font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:700;color:var(--g);
-  background:rgba(232,185,79,.05);border:1.5px solid var(--b);border-radius:10px;
-  outline:none;transition:all .2s;-webkit-appearance:none;caret-color:transparent;
+.otp-boxes{
+  display:flex;gap:9px;justify-content:center;
+  margin:20px 0 6px;
 }
-.boxes input:focus{border-color:var(--g);background:rgba(232,185,79,.09);box-shadow:0 0 14px rgba(232,185,79,.22)}
-.boxes input.ok{border-color:rgba(232,185,79,.45)}
-.boxes input.ko{border-color:var(--red);animation:shake .35s ease}
-@keyframes shake{0%,100%{transform:translateX(0)}30%{transform:translateX(-5px)}70%{transform:translateX(5px)}}
+.otp-box{
+  width:48px;height:60px;
+  text-align:center;
+  font-family:'Orbitron',monospace;font-size:1.35rem;font-weight:800;
+  color:var(--g1);
+  background:rgba(245,200,66,.04);
+  border:1.5px solid var(--border);
+  border-radius:var(--r1);
+  outline:none;
+  transition:all .2s;
+  -webkit-appearance:none;
+  caret-color:transparent;
+  position:relative;
+}
+.otp-box:focus{
+  border-color:var(--g1);
+  background:rgba(245,200,66,.08);
+  box-shadow:0 0 20px rgba(245,200,66,.2),0 0 0 3px rgba(245,200,66,.08);
+  transform:scale(1.06);
+}
+.otp-box.filled{border-color:rgba(245,200,66,.45);background:rgba(245,200,66,.07)}
+.otp-box.bad{
+  border-color:var(--red);
+  background:rgba(240,64,96,.08);
+  animation:boxshake .4s ease;
+}
+@keyframes boxshake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-6px)}
+  40%{transform:translateX(6px)}
+  60%{transform:translateX(-4px)}
+  80%{transform:translateX(4px)}
+}
+.otp-box.valid{
+  border-color:var(--green);
+  background:rgba(40,216,136,.06);
+  color:var(--green);
+}
 
-/* Barre expiry */
-.expbar{height:2px;background:rgba(232,185,79,.1);border-radius:2px;margin:10px 0 14px;overflow:hidden}
-.expfill{height:100%;background:var(--g);border-radius:2px;transition:width .5s linear,background .5s}
+/* Renvoi */
+.resend-zone{text-align:center;margin-top:16px;font-size:.7rem;color:var(--t3)}
+.resend-btn{
+  background:none;border:none;color:var(--g2);
+  cursor:pointer;font-family:'Outfit',sans-serif;
+  font-size:.7rem;font-weight:500;text-decoration:underline;
+  padding:0;transition:color .2s;
+}
+.resend-btn:hover{color:var(--g1)}
+.resend-btn:disabled{opacity:.3;cursor:not-allowed;text-decoration:none}
+.resend-timer{color:var(--t3);font-variant-numeric:tabular-nums}
 
-.resend{text-align:center;margin-top:14px;font-size:.7rem;color:var(--dim)}
-.rbtn{background:none;border:none;color:var(--g);cursor:pointer;
-  font-family:'Inter',sans-serif;font-size:.7rem;text-decoration:underline;padding:0}
-.rbtn:disabled{opacity:.35;cursor:not-allowed;text-decoration:none}
+/* ═══════════════════════════════════════════════════
+   OVERLAY SUCCÈS
+═══════════════════════════════════════════════════ */
+.success-overlay{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(3,7,18,.97);
+  align-items:center;justify-content:center;
+  flex-direction:column;text-align:center;padding:24px;
+}
+.success-overlay.show{display:flex;animation:panelin .5s ease}
+.success-rocket{
+  font-size:5rem;display:block;margin-bottom:16px;
+  animation:rocketlaunch 1s cubic-bezier(.16,1,.3,1) forwards;
+}
+@keyframes rocketlaunch{
+  0%{transform:translateY(20px) rotate(-5deg);opacity:0}
+  100%{transform:translateY(-8px) rotate(3deg);opacity:1}
+}
+.success-stars{font-size:1.2rem;letter-spacing:.5em;margin-bottom:14px;animation:startwinkle 1.5s ease infinite}
+@keyframes startwinkle{0%,100%{opacity:.4}50%{opacity:1}}
+.success-title{
+  font-family:'Orbitron',monospace;font-weight:900;
+  font-size:1.4rem;color:var(--g1);
+  text-shadow:0 0 40px rgba(245,200,66,.5);
+  margin-bottom:10px;letter-spacing:.1em;
+}
+.success-sub{font-size:.82rem;color:var(--t2);line-height:1.8;margin-bottom:26px}
+.success-bar-wrap{width:220px;height:3px;background:rgba(245,200,66,.1);border-radius:3px;overflow:hidden}
+.success-bar{height:100%;background:linear-gradient(90deg,var(--g4),var(--g2),var(--g1),var(--g3));border-radius:3px;width:0;box-shadow:0 0 12px var(--g1);transition:width 2s cubic-bezier(.4,0,.2,1)}
 
-/* SUCCÈS */
-.sov{display:none;position:fixed;inset:0;z-index:200;background:rgba(6,10,18,.97);
-  align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:20px}
-.sov.on{display:flex;animation:fi .4s ease}
-.s-ico{font-size:4rem;margin-bottom:12px;animation:bounce 1s ease infinite alternate}
-@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-12px)}}
-.s-t{font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:900;color:var(--g);
-  text-shadow:0 0 24px rgba(232,185,79,.4);margin-bottom:8px}
-.s-s{color:var(--dim);font-size:.82rem;line-height:1.7}
-.s-prog{width:200px;height:2px;background:rgba(232,185,79,.12);border-radius:2px;margin-top:22px;overflow:hidden}
-.s-fill{height:100%;background:var(--g);box-shadow:0 0 8px var(--g);width:0;transition:width 2s linear}
+/* ═══════════════════════════════════════════════════
+   FOOTER CARD
+═══════════════════════════════════════════════════ */
+.card-footer{
+  padding:14px 36px 20px;
+  border-top:1px solid var(--border3);
+  text-align:center;
+}
+.card-footer p{font-size:.6rem;color:var(--t3);line-height:1.9;letter-spacing:.04em}
+.card-footer a{color:rgba(245,200,66,.3);text-decoration:none;transition:color .2s}
+.card-footer a:hover{color:var(--g1)}
 
-/* FOOT */
-.foot{padding:12px 32px 18px;text-align:center;border-top:1px solid var(--b)}
-.foot p{font-size:.6rem;color:var(--dim);line-height:1.8}
-.foot a{color:rgba(232,185,79,.35);text-decoration:none}
-.foot a:hover{color:var(--g)}
-
-/* particules */
-.pt{position:fixed;border-radius:50%;pointer-events:none;z-index:2;animation:fp linear infinite;opacity:0}
-@keyframes fp{0%{transform:translateY(105vh);opacity:0}8%{opacity:.6}92%{opacity:.15}100%{transform:translateY(-8vh);opacity:0}}
-
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════ */
 @media(max-width:480px){
-  .body,.head,.foot{padding-left:20px;padding-right:20px}
-  .boxes input{width:40px;height:52px;font-size:1.15rem}
+  .card-header,.card-body,.card-footer{padding-left:20px;padding-right:20px}
+  .otp-box{width:42px;height:54px;font-size:1.15rem}
+  .logo-name{font-size:1.05rem}
+  .otp-boxes{gap:7px}
 }
-@media(max-height:680px){
-  .head{padding-top:18px;padding-bottom:14px}.ico{font-size:1.8rem}
-  .body{padding-top:18px;padding-bottom:18px}.fld{margin-bottom:10px}
+@media(max-height:700px){
+  .card-header{padding-top:20px;padding-bottom:16px}
+  .planet-emoji{font-size:2rem}
+  .card-body{padding-top:18px;padding-bottom:20px}
+  .field{margin-bottom:10px}
+  .otp-boxes{margin:14px 0 4px}
 }
 </style>
 </head>
 <body>
-<canvas id="cv"></canvas>
-<div class="nb"></div>
-<div id="pts"></div>
 
-<!-- Succès -->
-<div class="sov" id="SOV">
-  <div class="s-ico">🚀</div>
-  <div class="s-t">DÉCOLLAGE RÉUSSI</div>
-  <div class="s-s">Bienvenue, Pilote.<br/>Votre empire vous attend.</div>
-  <div class="s-prog"><div class="s-fill" id="SF"></div></div>
+<!-- ═══ CANVAS ÉTOILES ═══ -->
+<canvas id="cv"></canvas>
+<div class="nebula"></div>
+<div class="hologrid"></div>
+<div id="particles"></div>
+
+<!-- ═══ OVERLAY SUCCÈS ═══ -->
+<div class="success-overlay" id="successOverlay">
+  <span class="success-rocket">🚀</span>
+  <div class="success-stars">✦ ✦ ✦ ✦ ✦</div>
+  <div class="success-title">DÉCOLLAGE RÉUSSI</div>
+  <div class="success-sub">
+    Bienvenue dans la galaxie, Pilote.<br/>
+    Votre empire vous attend...<br/>
+    <span id="successEmail" style="color:var(--g2);font-size:.76rem"></span>
+  </div>
+  <div class="success-bar-wrap">
+    <div class="success-bar" id="successBar"></div>
+  </div>
 </div>
 
-<div class="w">
+<!-- ═══ SCÈNE PRINCIPALE ═══ -->
+<div class="scene">
 <div class="card">
 
-  <!-- Head -->
-  <div class="head">
-    <span class="ico">🪐</span>
-    <div class="brand">GALAXY INVESTOR</div>
-    <div class="sub">Accès sécurisé · 2026</div>
+  <!-- HEADER -->
+  <div class="card-header">
+    <div class="orbit-wrap">
+      <span class="planet-emoji">🪐</span>
+      <div class="orbit-ring"></div>
+    </div>
+    <div class="logo-name">GALAXY INVESTOR</div>
+    <div class="logo-tag">Plateforme d'investissement · 2026</div>
+    <div class="security-badge">
+      <span class="security-dot"></span>
+      Connexion sécurisée SSL
+    </div>
   </div>
 
-  <!-- Tabs -->
-  <div class="tabs" id="TABS">
-    <button class="tab on" id="tL" onclick="goTab('L')">Connexion</button>
-    <button class="tab" id="tS" onclick="goTab('S')">Inscription</button>
+  <!-- TABS -->
+  <div class="tabs" id="tabsBar">
+    <button class="tab-btn active" id="tabLogin" onclick="switchTab('login')">
+      Connexion
+    </button>
+    <button class="tab-btn" id="tabSignup" onclick="switchTab('signup')">
+      Inscription
+    </button>
   </div>
 
-  <!-- Body -->
-  <div class="body">
+  <!-- CARD BODY -->
+  <div class="card-body">
 
-    <!-- CONNEXION -->
-    <div class="pan on" id="pL">
-      <div class="fld">
-        <div class="lbl"><span>E-mail</span></div>
-        <input class="inp" type="email" id="lE" placeholder="pilote@galaxie.io" autocomplete="email"/>
-      </div>
-      <div class="fld">
-        <div class="lbl"><span>Mot de passe</span></div>
-        <input class="inp" type="password" id="lP" placeholder="••••••••" autocomplete="current-password"/>
-      </div>
-      <div class="msg" id="lM"></div>
-      <button class="btn" id="lB" onclick="doLogin()"><span class="shine"></span>Entrer dans la galaxie</button>
-    </div>
+    <!-- ══════ PANNEAU CONNEXION ══════ -->
+    <div class="panel active" id="panelLogin">
 
-    <!-- INSCRIPTION -->
-    <div class="pan" id="pS">
-      <div class="fld">
-        <div class="lbl"><span>E-mail</span></div>
-        <input class="inp" type="email" id="sE" placeholder="pilote@galaxie.io" autocomplete="email"/>
+      <div class="field">
+        <div class="field-top">
+          <span class="field-label">Adresse e-mail</span>
+        </div>
+        <div class="input-wrap">
+          <input class="field-input" type="email" id="loginEmail"
+            placeholder="pilote@galaxie.io"
+            autocomplete="email"
+            oninput="validateEmail(this,'loginEmail')"/>
+          <span class="field-icon">✉️</span>
+        </div>
       </div>
-      <div class="fld">
-        <div class="lbl"><span>Mot de passe</span></div>
-        <input class="inp" type="password" id="sP" placeholder="8 caractères minimum" autocomplete="new-password"/>
-      </div>
-      <div class="fld">
-        <div class="lbl"><span>Confirmer</span></div>
-        <input class="inp" type="password" id="sC" placeholder="Répétez le mot de passe" autocomplete="new-password"/>
-      </div>
-      <div class="fld">
-        <div class="lbl"><span>Parrainage</span><span class="op">Optionnel</span></div>
-        <input class="inp" type="text" id="sR" placeholder="GAL-XXXX" autocomplete="off"/>
-      </div>
-      <div class="msg" id="sM"></div>
-      <button class="btn" id="sB" onclick="doSignup()"><span class="shine"></span>Créer mon compte</button>
-    </div>
 
-    <!-- OTP -->
-    <div class="otp" id="OTP">
-      <div class="otp-head">
-        <span class="otp-ico">📡</span>
-        <div class="otp-title">Code de vérification</div>
-        <div class="otp-info">Envoyé à <b id="OE"></b><br/>Valable <b>10 minutes</b></div>
+      <div class="field">
+        <div class="field-top">
+          <span class="field-label">Mot de passe</span>
+        </div>
+        <div class="input-wrap">
+          <input class="field-input" type="password" id="loginPass"
+            placeholder="••••••••"
+            autocomplete="current-password"/>
+          <span class="field-icon">🔑</span>
+        </div>
       </div>
-      <div class="expbar"><div class="expfill" id="EF" style="width:100%"></div></div>
-      <div class="boxes" id="BX">
-        <input type="text" maxlength="1" inputmode="numeric"/>
-        <input type="text" maxlength="1" inputmode="numeric"/>
-        <input type="text" maxlength="1" inputmode="numeric"/>
-        <input type="text" maxlength="1" inputmode="numeric"/>
-        <input type="text" maxlength="1" inputmode="numeric"/>
-        <input type="text" maxlength="1" inputmode="numeric"/>
+
+      <div class="msg-box" id="loginMsg"></div>
+
+      <button class="btn-main" id="loginBtn" onclick="doLogin()">
+        Entrer dans la galaxie
+      </button>
+
+    </div><!-- /panelLogin -->
+
+    <!-- ══════ PANNEAU INSCRIPTION ══════ -->
+    <div class="panel" id="panelSignup">
+
+      <div class="field">
+        <div class="field-top">
+          <span class="field-label">Adresse e-mail</span>
+        </div>
+        <div class="input-wrap">
+          <input class="field-input" type="email" id="signupEmail"
+            placeholder="pilote@galaxie.io"
+            autocomplete="email"
+            oninput="validateEmail(this,'signupEmail')"/>
+          <span class="field-icon">✉️</span>
+        </div>
       </div>
-      <div class="msg" id="oM"></div>
-      <button class="btn" id="oB" onclick="doOTP()"><span class="shine"></span>Valider</button>
-      <div class="resend">Pas reçu ? <button class="rbtn" id="RB" onclick="doResend()" disabled>Renvoyer</button> <span id="RT"></span></div>
-    </div>
 
-  </div><!-- /body -->
+      <div class="field">
+        <div class="field-top">
+          <span class="field-label">Mot de passe</span>
+        </div>
+        <div class="input-wrap">
+          <input class="field-input" type="password" id="signupPass"
+            placeholder="8 caractères minimum"
+            autocomplete="new-password"
+            oninput="checkPassStrength()"/>
+          <span class="field-icon">🔑</span>
+        </div>
+        <!-- Barre force mot de passe -->
+        <div style="margin-top:6px;height:2px;background:var(--border3);border-radius:2px;overflow:hidden">
+          <div id="passStrengthBar" style="height:100%;width:0%;border-radius:2px;transition:width .3s,background .3s"></div>
+        </div>
+        <div id="passStrengthLabel" style="font-size:.58rem;color:var(--t3);margin-top:3px;height:12px"></div>
+      </div>
 
-  <div class="foot">
-    <p>🔒 Connexion chiffrée · Sécurisé par Supabase<br/>
-    <a href="#">CGU</a> · <a href="#">Confidentialité</a></p>
+      <div class="field">
+        <div class="field-top">
+          <span class="field-label">Confirmer le mot de passe</span>
+        </div>
+        <div class="input-wrap">
+          <input class="field-input" type="password" id="signupConfirm"
+            placeholder="Répétez votre mot de passe"
+            autocomplete="new-password"/>
+          <span class="field-icon">🔒</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-top">
+          <span class="field-label">Code de parrainage</span>
+          <span class="field-hint">Optionnel</span>
+        </div>
+        <div class="input-wrap">
+          <input class="field-input" type="text" id="signupRef"
+            placeholder="GAL-XXXX"
+            autocomplete="off"
+            style="text-transform:uppercase"
+            oninput="this.value=this.value.toUpperCase()"/>
+          <span class="field-icon">🌟</span>
+        </div>
+      </div>
+
+      <div class="msg-box" id="signupMsg"></div>
+
+      <button class="btn-main" id="signupBtn" onclick="doSignup()">
+        Créer mon compte
+      </button>
+
+    </div><!-- /panelSignup -->
+
+    <!-- ══════ PANNEAU OTP ══════ -->
+    <div class="otp-panel" id="otpPanel">
+
+      <div class="otp-hero">
+        <span class="otp-icon">📡</span>
+        <div class="otp-title">Code de Vérification</div>
+        <div class="otp-desc">
+          Code à 6 chiffres envoyé à<br/>
+          <strong id="otpEmailDisplay"></strong><br/>
+          Valable <strong>10 minutes</strong>
+        </div>
+      </div>
+
+      <!-- Barre expiration -->
+      <div class="exp-track">
+        <div class="exp-fill" id="expFill"></div>
+      </div>
+
+      <!-- Cases OTP -->
+      <div class="otp-boxes" id="otpBoxes">
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]"/>
+      </div>
+
+      <div class="msg-box" id="otpMsg"></div>
+
+      <button class="btn-main" id="otpBtn" onclick="doVerifyOTP()">
+        Valider le code
+      </button>
+
+      <div class="resend-zone">
+        Pas reçu ?&nbsp;
+        <button class="resend-btn" id="resendBtn" onclick="doResend()" disabled>
+          Renvoyer un code
+        </button>
+        <span class="resend-timer" id="resendTimer"></span>
+      </div>
+
+    </div><!-- /otpPanel -->
+
+  </div><!-- /card-body -->
+
+  <!-- FOOTER -->
+  <div class="card-footer">
+    <p>
+      🔒 Connexion chiffrée · Données sécurisées par Supabase<br/>
+      <a href="#">Conditions d'utilisation</a> ·
+      <a href="#">Confidentialité</a> ·
+      <a href="#">Support</a>
+    </p>
   </div>
 
-</div>
-</div>
+</div><!-- /card -->
+</div><!-- /scene -->
 
+<!-- ═══════════════════════════════════════════════════════
+     SCRIPT PRINCIPAL
+═══════════════════════════════════════════════════════ -->
 <script>
-/* ══════════════════════════════════════
-   CONFIG SUPABASE
-══════════════════════════════════════ */
-const SB  = 'https://fwkisfdoqazapjdnhmwb.supabase.co';
-const KEY = 'sb_publishable_MSJBTK0-UaBjtoeQTgJ1XQ_pvS3NM_h';
-const H   = {
+'use strict';
+
+/* ══════════════════════════════════════════════════
+   ① CONFIGURATION SUPABASE
+   URL du projet + Clé API anonyme publique
+   Ces deux valeurs connectent ce script à votre
+   base de données Supabase et permettent :
+   - La création de comptes (signup)
+   - L'envoi des codes OTP par mail
+   - La vérification stricte des codes
+   - L'authentification par session
+══════════════════════════════════════════════════ */
+const SUPABASE_URL = 'https://fwkisfdoqazapjdnhmwb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_MSJBTK0-UaBjtoeQTgJ1XQ_pvS3NM_h';
+
+// En-têtes HTTP envoyés à chaque requête Supabase
+const SB_HEADERS = {
   'Content-Type' : 'application/json',
-  'apikey'       : KEY,
-  'Authorization': 'Bearer ' + KEY
+  'apikey'       : SUPABASE_KEY,
+  'Authorization': `Bearer ${SUPABASE_KEY}`
 };
 
-/* ══════════════════════════════════════
-   ÉTAT
-══════════════════════════════════════ */
-let EMAIL     = '';
-let riTmr     = null;   // timer renvoi 60s
-let expTmr    = null;   // timer barre expiry 10min
-let expEnd    = 0;
-const EXP_SEC = 600;    // 10 minutes
+// URL de redirection après authentification (GitHub Pages)
+// Modifie cette URL avec ton vrai domaine GitHub Pages
+const SITE_URL = window.location.origin + window.location.pathname;
 
-/* ══════════════════════════════════════
-   SUPABASE CALL
-══════════════════════════════════════ */
-async function sb(path, body) {
-  const r = await fetch(SB + '/auth/v1/' + path, {
-    method:'POST', headers:H, body:JSON.stringify(body)
-  });
-  return r.json();
-}
-
-/* ══════════════════════════════════════
-   ÉTOILES
-══════════════════════════════════════ */
-(function(){
-  const c=document.getElementById('cv'), x=c.getContext('2d'); let S=[], f=0;
-  const rz=()=>{c.width=innerWidth;c.height=innerHeight;};
-  rz(); addEventListener('resize',rz);
-  function mk(){S=[];const n=Math.floor(c.width*c.height/2600);for(let i=0;i<n;i++)S.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.4+.2,sp:Math.random()*.003+.001,ph:Math.random()*Math.PI*2});}
-  mk();
-  (function draw(){x.clearRect(0,0,c.width,c.height);f++;S.forEach(s=>{const a=.15+.85*Math.abs(Math.sin(f*s.sp+s.ph));x.beginPath();x.arc(s.x,s.y,s.r,0,Math.PI*2);x.fillStyle=`rgba(255,240,200,${a})`;x.fill();});requestAnimationFrame(draw);})();
-})();
-
-/* ══════════════════════════════════════
-   PARTICULES
-══════════════════════════════════════ */
-(function(){
-  const c=document.getElementById('pts'), cols=['#e8b94f','#6040d0','#3070e0','#d05030'];
-  for(let i=0;i<12;i++){const p=document.createElement('div');p.className='pt';const s=Math.random()*3+1.5;p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;background:${cols[~~(Math.random()*4)]};animation-duration:${15+Math.random()*20}s;animation-delay:${Math.random()*20}s`;document.getElementById('pts').appendChild(p);}
-})();
-
-/* ══════════════════════════════════════
-   HELPERS
-══════════════════════════════════════ */
-function showMsg(id,txt,type){const e=document.getElementById(id);e.className='msg '+type;e.textContent=txt;}
-function clrMsg(id){const e=document.getElementById(id);e.className='msg';e.textContent='';}
-function setBtn(id,loading,lbl){const b=document.getElementById(id);b.disabled=loading;b.innerHTML=loading?`<span class="sp"></span>Chargement...`:`<span class="shine"></span>${lbl}`;}
-
-const ERS={
-  'User already registered'        :'⚠️ E-mail déjà utilisé. Connectez-vous.',
-  'Invalid login credentials'      :'❌ E-mail ou mot de passe incorrect.',
-  'Email not confirmed'            :'📧 E-mail non vérifié. Créez d\'abord un compte.',
-  'Token has expired or is invalid':'❌ Code invalide ou expiré.',
-  'OTP expired'                    :'❌ Code expiré. Renvoyez-en un nouveau.',
-  'For security purposes'          :'⏳ Attendez avant de renvoyer un code.',
-  'Password should be at least'    :'⚠️ Mot de passe trop court (8 min).',
+/* ══════════════════════════════════════════════════
+   ② ÉTAT DE L'APPLICATION
+══════════════════════════════════════════════════ */
+const STATE = {
+  email      : '',       // email en cours d'inscription/vérification
+  mode       : 'signup', // type OTP : 'signup'
+  expTimer   : null,     // timer barre d'expiration
+  resendTimer: null,     // timer bouton renvoi
+  expEndTime : 0,        // timestamp fin d'expiration OTP
+  OTP_DURATION: 600,     // durée code OTP en secondes (10 min)
+  RESEND_WAIT : 60,      // délai avant renvoi en secondes
 };
-function frE(m){for(const k in ERS)if(m&&m.includes(k))return ERS[k];return'❌ '+(m||'Erreur. Réessayez.');}
 
-/* ══════════════════════════════════════
-   TABS
-══════════════════════════════════════ */
-function goTab(t){
-  ['L','S'].forEach(x=>{
-    document.getElementById('t'+x).classList.remove('on');
-    document.getElementById('p'+x).classList.remove('on');
+/* ══════════════════════════════════════════════════
+   ③ APPEL API SUPABASE
+   Fonction centrale qui communique avec Supabase.
+   Chaque appel envoie les bonnes données et reçoit
+   la réponse (succès ou erreur).
+══════════════════════════════════════════════════ */
+async function supabaseCall(endpoint, body) {
+  const response = await fetch(`${SUPABASE_URL}/auth/v1/${endpoint}`, {
+    method : 'POST',
+    headers: SB_HEADERS,
+    body   : JSON.stringify(body)
   });
-  document.getElementById('t'+t).classList.add('on');
-  document.getElementById('p'+t).classList.add('on');
-  clrMsg('lM');clrMsg('sM');
+  return await response.json();
 }
 
-/* ══════════════════════════════════════
-   AFFICHER OTP
-══════════════════════════════════════ */
-function showOTP(email){
-  EMAIL=email;
-  document.getElementById('OE').textContent=email;
-  document.getElementById('pL').classList.remove('on');
-  document.getElementById('pS').classList.remove('on');
-  document.getElementById('TABS').style.display='none';
-  document.getElementById('OTP').classList.add('on');
-  resetBoxes();
-  document.querySelectorAll('#BX input')[0].focus();
-  startCountdown(60);
-  startExpiry();
+/* ══════════════════════════════════════════════════
+   ④ CANVAS — FOND ÉTOILES ANIMÉ
+   Génère un ciel étoilé dynamique avec scintillement.
+   Les étoiles ont des tailles, vitesses et phases
+   aléatoires pour un effet naturel.
+══════════════════════════════════════════════════ */
+(function initStarfield() {
+  const canvas = document.getElementById('cv');
+  const ctx    = canvas.getContext('2d');
+  let stars    = [];
+  let frame    = 0;
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    generateStars();
+  }
+
+  function generateStars() {
+    stars = [];
+    const count = Math.floor((canvas.width * canvas.height) / 2200);
+    for (let i = 0; i < count; i++) {
+      const isBright = Math.random() > 0.88;
+      stars.push({
+        x    : Math.random() * canvas.width,
+        y    : Math.random() * canvas.height,
+        r    : isBright ? Math.random() * 1.8 + .6 : Math.random() * 1.1 + .15,
+        speed: Math.random() * .0025 + .0006,
+        phase: Math.random() * Math.PI * 2,
+        color: isBright
+          ? `rgba(255,248,220,`
+          : Math.random() > .5 ? `rgba(200,220,255,` : `rgba(255,240,200,`
+      });
+    }
+  }
+
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    frame++;
+    stars.forEach(s => {
+      const alpha = .1 + .9 * Math.abs(Math.sin(frame * s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = s.color + alpha + ')';
+      ctx.fill();
+
+      // Halo pour étoiles brillantes
+      if (s.r > 1.2 && alpha > 0.7) {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r * 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = s.color + (alpha * .12) + ')';
+        ctx.fill();
+      }
+    });
+    requestAnimationFrame(drawStars);
+  }
+
+  resize();
+  window.addEventListener('resize', resize);
+  drawStars();
+})();
+
+/* ══════════════════════════════════════════════════
+   ⑤ PARTICULES FLOTTANTES
+   Petites particules colorées qui montent lentement
+   pour renforcer l'atmosphère spatiale.
+══════════════════════════════════════════════════ */
+(function initParticles() {
+  const container = document.getElementById('particles');
+  const palette   = ['#f5c842','#e8a820','#6040d0','#3060e0','#d04020','#20c090'];
+
+  for (let i = 0; i < 20; i++) {
+    const dot  = document.createElement('div');
+    dot.className = 'pt';
+    const size = Math.random() * 3.5 + 1.2;
+    const col  = palette[Math.floor(Math.random() * palette.length)];
+
+    dot.style.cssText = [
+      `width:${size}px`,
+      `height:${size}px`,
+      `left:${Math.random() * 100}%`,
+      `background:${col}`,
+      `box-shadow:0 0 ${size * 4}px ${col}`,
+      `animation-duration:${16 + Math.random() * 22}s`,
+      `animation-delay:${Math.random() * 22}s`,
+    ].join(';');
+
+    container.appendChild(dot);
+  }
+})();
+
+/* ══════════════════════════════════════════════════
+   ⑥ NAVIGATION — TABS
+══════════════════════════════════════════════════ */
+function switchTab(tab) {
+  const isLogin = tab === 'login';
+
+  document.getElementById('tabLogin').classList.toggle('active', isLogin);
+  document.getElementById('tabSignup').classList.toggle('active', !isLogin);
+  document.getElementById('panelLogin').classList.toggle('active', isLogin);
+  document.getElementById('panelSignup').classList.toggle('active', !isLogin);
+
+  clearMsg('loginMsg');
+  clearMsg('signupMsg');
 }
 
-function resetBoxes(){
-  document.querySelectorAll('#BX input').forEach(i=>{i.value='';i.classList.remove('ok','ko');});
-  document.getElementById('EF').style.width='100%';
+/* ══════════════════════════════════════════════════
+   ⑦ AFFICHER LE PANNEAU OTP
+   Masque les tabs et formulaires, affiche les cases.
+══════════════════════════════════════════════════ */
+function showOTPPanel(email) {
+  STATE.email = email;
+
+  document.getElementById('otpEmailDisplay').textContent = email;
+  document.getElementById('panelLogin').classList.remove('active');
+  document.getElementById('panelSignup').classList.remove('active');
+  document.getElementById('tabsBar').style.display = 'none';
+  document.getElementById('otpPanel').classList.add('active');
+
+  resetOTPBoxes();
+  document.querySelectorAll('.otp-box')[0].focus();
+  startResendCountdown(STATE.RESEND_WAIT);
+  startExpiryBar(STATE.OTP_DURATION);
 }
 
-/* ══════════════════════════════════════
-   TIMERS
-══════════════════════════════════════ */
-function startCountdown(s){
-  clearInterval(riTmr);
-  const btn=document.getElementById('RB'),tim=document.getElementById('RT');
-  btn.disabled=true;let n=s;tim.textContent=`(${n}s)`;
-  riTmr=setInterval(()=>{n--;tim.textContent=n>0?`(${n}s)`:'';if(n<=0){clearInterval(riTmr);btn.disabled=false;}},1000);
+/* ══════════════════════════════════════════════════
+   ⑧ RESET CASES OTP
+══════════════════════════════════════════════════ */
+function resetOTPBoxes() {
+  document.querySelectorAll('.otp-box').forEach(box => {
+    box.value = '';
+    box.classList.remove('filled', 'bad', 'valid');
+  });
+  document.getElementById('expFill').style.width = '100%';
 }
 
-function startExpiry(){
-  clearInterval(expTmr);
-  expEnd=Date.now()+EXP_SEC*1000;
-  const bar=document.getElementById('EF');
-  expTmr=setInterval(()=>{
-    const left=Math.max(0,expEnd-Date.now());
-    const pct=left/(EXP_SEC*1000)*100;
-    bar.style.width=pct+'%';
-    bar.style.background=pct<20?'#e05060':'var(--g)';
-    if(left<=0){clearInterval(expTmr);showMsg('oM','⏰ Code expiré. Cliquez sur Renvoyer.','e');}
-  },500);
+/* ══════════════════════════════════════════════════
+   ⑨ TIMER — BARRE D'EXPIRATION (10 MIN)
+   La barre se vide progressivement.
+   Passe au rouge quand il reste moins de 20%.
+══════════════════════════════════════════════════ */
+function startExpiryBar(seconds) {
+  clearInterval(STATE.expTimer);
+  STATE.expEndTime = Date.now() + seconds * 1000;
+  const fill = document.getElementById('expFill');
+
+  STATE.expTimer = setInterval(() => {
+    const remaining = Math.max(0, STATE.expEndTime - Date.now());
+    const pct = (remaining / (seconds * 1000)) * 100;
+
+    fill.style.width = pct + '%';
+
+    if (pct < 20) {
+      fill.style.background = 'linear-gradient(90deg,#a02020,var(--red),#ff8080)';
+      fill.style.boxShadow  = '0 0 8px var(--red)';
+    } else {
+      fill.style.background = 'linear-gradient(90deg,var(--g2),var(--g1),var(--g3))';
+      fill.style.boxShadow  = '0 0 8px var(--g1)';
+    }
+
+    if (remaining <= 0) {
+      clearInterval(STATE.expTimer);
+      showMsg('otpMsg', '⏰ Code expiré. Cliquez sur "Renvoyer un code".', 'error');
+    }
+  }, 500);
 }
 
-/* ══════════════════════════════════════
-   SUCCÈS → retour connexion
-══════════════════════════════════════ */
-function showSuccess(msg, goLogin){
-  if(goLogin){
-    // Vérification OTP réussie → on revient sur connexion avec message
-    clearInterval(expTmr);
-    document.getElementById('OTP').classList.remove('on');
-    document.getElementById('TABS').style.display='flex';
-    goTab('L');
-    showMsg('lM','✅ Compte activé ! Connectez-vous maintenant.','s');
-    document.getElementById('lE').value=EMAIL;
-    document.getElementById('lP').focus();
-  } else {
-    // Connexion réussie → overlay succès puis dashboard
-    const sov=document.getElementById('SOV');
-    sov.classList.add('on');
-    setTimeout(()=>{document.getElementById('SF').style.width='100%';},100);
-    setTimeout(()=>{
-      // ← Décommente pour rediriger vers ton dashboard :
-      // window.location.href='/dashboard.html';
-    },2200);
+/* ══════════════════════════════════════════════════
+   ⑩ TIMER — BOUTON RENVOI (60s)
+══════════════════════════════════════════════════ */
+function startResendCountdown(seconds) {
+  clearInterval(STATE.resendTimer);
+  const btn   = document.getElementById('resendBtn');
+  const timer = document.getElementById('resendTimer');
+  btn.disabled = true;
+
+  let n = seconds;
+  timer.textContent = ` (${n}s)`;
+
+  STATE.resendTimer = setInterval(() => {
+    n--;
+    timer.textContent = n > 0 ? ` (${n}s)` : '';
+    if (n <= 0) {
+      clearInterval(STATE.resendTimer);
+      btn.disabled = false;
+    }
+  }, 1000);
+}
+
+/* ══════════════════════════════════════════════════
+   ⑪ NAVIGATION CLAVIER DANS LES CASES OTP
+   + Support paste (coller depuis presse-papier)
+   + Auto-submit quand les 6 cases sont remplies
+══════════════════════════════════════════════════ */
+(function initOTPBoxes() {
+  const boxes = document.querySelectorAll('.otp-box');
+
+  boxes.forEach((box, index) => {
+
+    // Saisie d'un chiffre
+    box.addEventListener('input', e => {
+      const val = e.target.value.replace(/\D/g, '');
+      e.target.value = val;
+
+      if (val) {
+        e.target.classList.add('filled');
+        e.target.classList.remove('bad');
+        if (index < boxes.length - 1) boxes[index + 1].focus();
+      } else {
+        e.target.classList.remove('filled');
+      }
+
+      // Auto-submit si toutes les cases sont remplies
+      const allFilled = [...boxes].every(b => b.value.length === 1);
+      if (allFilled) setTimeout(doVerifyOTP, 380);
+    });
+
+    // Suppression → retour en arrière
+    box.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !e.target.value && index > 0) {
+        boxes[index - 1].value = '';
+        boxes[index - 1].classList.remove('filled');
+        boxes[index - 1].focus();
+      }
+    });
+
+    // Coller le code depuis le presse-papier
+    box.addEventListener('paste', e => {
+      e.preventDefault();
+      const pasted = (e.clipboardData.getData('text') || '')
+        .replace(/\D/g, '')
+        .slice(0, 6);
+
+      [...boxes].forEach((b, i) => {
+        b.value = pasted[i] || '';
+        b.classList.toggle('filled', !!pasted[i]);
+        b.classList.remove('bad');
+      });
+
+      if (pasted.length === 6) setTimeout(doVerifyOTP, 380);
+    });
+
+    // Sélectionner tout au focus
+    box.addEventListener('focus', e => e.target.select());
+  });
+})();
+
+/* ══════════════════════════════════════════════════
+   ⑫ HELPERS INTERFACE
+══════════════════════════════════════════════════ */
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  el.className = `msg-box ${type}`;
+  el.textContent = text;
+}
+function clearMsg(id) {
+  const el = document.getElementById(id);
+  el.className = 'msg-box';
+  el.textContent = '';
+}
+function setLoading(btnId, isLoading, label) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = isLoading;
+  btn.innerHTML = isLoading
+    ? `<span class="spin"></span>Chargement...`
+    : label;
+}
+
+// Traduction des erreurs Supabase en français
+const ERROR_MAP = {
+  'User already registered'        : '⚠️ Cet e-mail est déjà utilisé. Connectez-vous.',
+  'Invalid login credentials'      : '❌ E-mail ou mot de passe incorrect.',
+  'Email not confirmed'            : '📧 E-mail non vérifié. Créez d\'abord un compte.',
+  'Token has expired or is invalid': '❌ Code invalide ou expiré. Renvoyez-en un.',
+  'OTP expired'                    : '❌ Code expiré. Cliquez sur "Renvoyer".',
+  'For security purposes'          : '⏳ Attendez avant de redemander un code.',
+  'Password should be at least'    : '⚠️ Mot de passe trop court (8 caractères min.).',
+  'Signup is disabled'             : '⚠️ Les inscriptions sont temporairement fermées.',
+  'Email rate limit exceeded'      : '⏳ Trop de tentatives. Attendez quelques minutes.',
+};
+function translateError(msg) {
+  if (!msg) return '❌ Erreur inconnue. Réessayez.';
+  for (const key in ERROR_MAP) {
+    if (msg.includes(key)) return ERROR_MAP[key];
+  }
+  return '❌ ' + msg;
+}
+
+/* ══════════════════════════════════════════════════
+   ⑬ VALIDATION E-MAIL EN TEMPS RÉEL
+══════════════════════════════════════════════════ */
+function validateEmail(input) {
+  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim());
+  input.classList.toggle('good', valid && input.value.length > 0);
+  input.classList.toggle('err', !valid && input.value.length > 3);
+}
+
+/* ══════════════════════════════════════════════════
+   ⑭ FORCE DU MOT DE PASSE EN TEMPS RÉEL
+══════════════════════════════════════════════════ */
+function checkPassStrength() {
+  const pass  = document.getElementById('signupPass').value;
+  const bar   = document.getElementById('passStrengthBar');
+  const label = document.getElementById('passStrengthLabel');
+
+  let score = 0;
+  if (pass.length >= 8)  score++;
+  if (pass.length >= 12) score++;
+  if (/[A-Z]/.test(pass)) score++;
+  if (/[0-9]/.test(pass)) score++;
+  if (/[^a-zA-Z0-9]/.test(pass)) score++;
+
+  const levels = [
+    {w:'0%',   bg:'transparent', txt:''},
+    {w:'25%',  bg:'#e04060',     txt:'Trop court'},
+    {w:'45%',  bg:'#e08020',     txt:'Faible'},
+    {w:'65%',  bg:'#e0c020',     txt:'Moyen'},
+    {w:'80%',  bg:'#80d040',     txt:'Fort'},
+    {w:'100%', bg:'#28d888',     txt:'Très fort 🔥'},
+  ];
+
+  const lvl = Math.min(score, levels.length - 1);
+  bar.style.width      = levels[lvl].w;
+  bar.style.background = levels[lvl].bg;
+  bar.style.boxShadow  = lvl >= 3 ? `0 0 8px ${levels[lvl].bg}` : 'none';
+  label.style.color    = levels[lvl].bg;
+  label.textContent    = pass.length > 0 ? levels[lvl].txt : '';
+}
+
+/* ══════════════════════════════════════════════════
+   ⑮ OVERLAY SUCCÈS
+   Après connexion réussie → affiche l'animation
+   puis redirige vers le dashboard.
+══════════════════════════════════════════════════ */
+function showSuccess(email) {
+  document.getElementById('successEmail').textContent = email || STATE.email;
+  document.getElementById('successOverlay').classList.add('show');
+  // Barre de progression
+  setTimeout(() => {
+    document.getElementById('successBar').style.width = '100%';
+  }, 100);
+  // Redirection vers dashboard (décommente la ligne ci-dessous)
+  setTimeout(() => {
+    // window.location.href = '/dashboard.html';
+  }, 2300);
+}
+
+/* ══════════════════════════════════════════════════
+   ⑯ INSCRIPTION
+   1. Validation des champs côté client
+   2. Appel Supabase /auth/v1/signup
+   3. Supabase crée le compte et envoie l'OTP par mail
+   4. On affiche le panneau OTP
+══════════════════════════════════════════════════ */
+async function doSignup() {
+  clearMsg('signupMsg');
+
+  const email   = document.getElementById('signupEmail').value.trim();
+  const pass    = document.getElementById('signupPass').value;
+  const confirm = document.getElementById('signupConfirm').value;
+  const ref     = document.getElementById('signupRef').value.trim();
+
+  // Validations
+  if (!email)
+    return showMsg('signupMsg', '⚠️ Veuillez entrer votre adresse e-mail.', 'error');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    return showMsg('signupMsg', '⚠️ Adresse e-mail invalide.', 'error');
+  if (pass.length < 8)
+    return showMsg('signupMsg', '⚠️ Mot de passe : 8 caractères minimum.', 'error');
+  if (pass !== confirm)
+    return showMsg('signupMsg', '⚠️ Les mots de passe ne correspondent pas.', 'error');
+
+  setLoading('signupBtn', true, 'Créer mon compte');
+
+  try {
+    // ← APPEL SUPABASE SIGNUP
+    // Supabase crée le compte et envoie automatiquement
+    // un e-mail avec le code OTP ({{ .Token }}) selon
+    // le template configuré dans Authentication > Email Templates
+    const data = await supabaseCall('signup', {
+      email,
+      password: pass,
+      options: {
+        emailRedirectTo: SITE_URL,
+        data: {
+          referral_code: ref || null,
+          signup_date  : new Date().toISOString(),
+          platform     : 'Galaxy Investor 2026',
+        }
+      }
+    });
+
+    if (data.error) {
+      showMsg('signupMsg', translateError(data.error.message), 'error');
+    } else {
+      showMsg('signupMsg', `✅ Compte créé ! Code envoyé à ${email}`, 'success');
+      setTimeout(() => showOTPPanel(email), 750);
+    }
+
+  } catch (e) {
+    showMsg('signupMsg', '❌ Erreur réseau. Vérifiez votre connexion.', 'error');
+  } finally {
+    setLoading('signupBtn', false, 'Créer mon compte');
   }
 }
 
-/* ══════════════════════════════════════
-   CASES OTP — navigation
-══════════════════════════════════════ */
-document.querySelectorAll('#BX input').forEach((inp,i,arr)=>{
-  inp.addEventListener('input',e=>{
-    const v=e.target.value.replace(/\D/g,'');
-    e.target.value=v;
-    if(v){e.target.classList.add('ok');if(i<5)arr[i+1].focus();}
-    else e.target.classList.remove('ok');
-    if([...arr].every(x=>x.value))setTimeout(doOTP,350);
-  });
-  inp.addEventListener('keydown',e=>{
-    if(e.key==='Backspace'&&!e.target.value&&i>0){
-      arr[i-1].value='';arr[i-1].classList.remove('ok');arr[i-1].focus();
+/* ══════════════════════════════════════════════════
+   ⑰ CONNEXION
+   1. Validation des champs
+   2. Appel Supabase /auth/v1/token (password grant)
+   3. Supabase retourne un access_token si OK
+   4. Session sauvegardée → overlay succès
+══════════════════════════════════════════════════ */
+async function doLogin() {
+  clearMsg('loginMsg');
+
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+
+  if (!email || !pass)
+    return showMsg('loginMsg', '⚠️ E-mail et mot de passe requis.', 'error');
+
+  setLoading('loginBtn', true, 'Entrer dans la galaxie');
+
+  try {
+    // ← APPEL SUPABASE LOGIN
+    // Supabase vérifie email + mot de passe
+    // Si correct → retourne access_token + refresh_token
+    // Si incorrect → retourne une erreur
+    const data = await supabaseCall('token?grant_type=password', {
+      email,
+      password: pass,
+    });
+
+    if (data.error) {
+      showMsg('loginMsg', translateError(data.error.message), 'error');
+    } else {
+      // ← SAUVEGARDER LA SESSION
+      // Tokens stockés localement pour maintenir la session
+      // et permettre au smartphone de mémoriser la connexion
+      localStorage.setItem('gi_access_token',  data.access_token);
+      localStorage.setItem('gi_refresh_token', data.refresh_token);
+      localStorage.setItem('gi_user_email',    email);
+      localStorage.setItem('gi_user_data',     JSON.stringify(data.user || {}));
+      localStorage.setItem('gi_session_time',  new Date().toISOString());
+
+      showMsg('loginMsg', '✅ Connexion réussie ! Bienvenue Pilote.', 'success');
+      setTimeout(() => showSuccess(email), 650);
     }
-  });
-  inp.addEventListener('paste',e=>{
-    e.preventDefault();
-    const p=(e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6);
-    [...arr].forEach((x,j)=>{x.value=p[j]||'';x.classList.toggle('ok',!!p[j]);});
-    if(p.length===6)setTimeout(doOTP,350);
-  });
+
+  } catch (e) {
+    showMsg('loginMsg', '❌ Erreur réseau. Vérifiez votre connexion.', 'error');
+  } finally {
+    setLoading('loginBtn', false, 'Entrer dans la galaxie');
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   ⑱ VÉRIFICATION OTP — STRICTE PAR SUPABASE
+   Le code saisi est envoyé à Supabase.
+   Supabase compare avec le VRAI code généré.
+   → Code faux  = erreur retournée, cases secouées
+   → Code juste = session créée, retour connexion
+══════════════════════════════════════════════════ */
+async function doVerifyOTP() {
+  clearMsg('otpMsg');
+
+  const boxes = document.querySelectorAll('.otp-box');
+  const token = [...boxes].map(b => b.value).join('');
+
+  if (token.length !== 6)
+    return showMsg('otpMsg', '⚠️ Entrez les 6 chiffres du code.', 'error');
+
+  // Vérification expiration locale
+  if (STATE.expEndTime > 0 && Date.now() > STATE.expEndTime)
+    return showMsg('otpMsg', '⏰ Code expiré. Cliquez sur "Renvoyer un code".', 'error');
+
+  setLoading('otpBtn', true, 'Valider le code');
+
+  try {
+    // ← APPEL SUPABASE VERIFY
+    // Supabase vérifie que `token` correspond exactement
+    // au code OTP qu'il a généré et envoyé par mail.
+    // Si le code ne correspond pas → data.error est retourné.
+    // Aucun contournement possible côté client.
+    const data = await supabaseCall('verify', {
+      type : STATE.mode,  // 'signup'
+      email: STATE.email,
+      token: token,       // ← le code tapé par l'utilisateur
+    });
+
+    if (data.error) {
+      // ❌ CODE INCORRECT — Supabase a refusé
+      showMsg('otpMsg', translateError(data.error.message), 'error');
+
+      // Animation d'erreur sur les cases
+      boxes.forEach(b => b.classList.add('bad'));
+      setTimeout(() => {
+        boxes.forEach(b => {
+          b.classList.remove('bad', 'filled');
+          b.value = '';
+        });
+        boxes[0].focus();
+      }, 550);
+
+    } else {
+      // ✅ CODE CORRECT — Supabase a validé
+      clearInterval(STATE.expTimer);
+
+      // Mettre les cases en vert
+      boxes.forEach(b => { b.classList.add('valid'); b.classList.remove('filled', 'bad'); });
+
+      // Sauvegarder la session si token reçu
+      if (data.access_token) {
+        localStorage.setItem('gi_access_token',  data.access_token);
+        localStorage.setItem('gi_refresh_token', data.refresh_token || '');
+        localStorage.setItem('gi_user_email',    STATE.email);
+        localStorage.setItem('gi_user_data',     JSON.stringify(data.user || {}));
+      }
+
+      showMsg('otpMsg', '✅ Code validé ! Compte activé.', 'success');
+
+      // Retour vers l'onglet Connexion avec email prérempli
+      setTimeout(() => {
+        clearInterval(STATE.resendTimer);
+        document.getElementById('otpPanel').classList.remove('active');
+        document.getElementById('tabsBar').style.display = 'flex';
+        switchTab('login');
+        document.getElementById('loginEmail').value = STATE.email;
+        showMsg('loginMsg', '✅ Compte activé ! Entrez votre mot de passe pour vous connecter.', 'success');
+        document.getElementById('loginPass').focus();
+      }, 900);
+    }
+
+  } catch (e) {
+    showMsg('otpMsg', '❌ Erreur réseau. Réessayez.', 'error');
+  } finally {
+    setLoading('otpBtn', false, 'Valider le code');
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   ⑲ RENVOYER UN CODE OTP
+   Appel Supabase /auth/v1/resend
+   Génère un nouveau code et le renvoie par mail.
+   Réinitialise les timers et les cases.
+══════════════════════════════════════════════════ */
+async function doResend() {
+  document.getElementById('resendBtn').disabled = true;
+  clearMsg('otpMsg');
+
+  try {
+    // ← APPEL SUPABASE RESEND
+    // Génère un nouveau code OTP et l'envoie par mail
+    const data = await supabaseCall('resend', {
+      type : 'signup',
+      email: STATE.email,
+    });
+
+    if (data.error) {
+      showMsg('otpMsg', translateError(data.error.message), 'error');
+      document.getElementById('resendBtn').disabled = false;
+    } else {
+      showMsg('otpMsg', `📡 Nouveau code envoyé à ${STATE.email}`, 'success');
+      resetOTPBoxes();
+      startResendCountdown(STATE.RESEND_WAIT);
+      startExpiryBar(STATE.OTP_DURATION);
+      document.querySelectorAll('.otp-box')[0].focus();
+    }
+
+  } catch (e) {
+    showMsg('otpMsg', '❌ Impossible de renvoyer. Réessayez.', 'error');
+    document.getElementById('resendBtn').disabled = false;
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   ⑳ TOUCHE ENTRÉE — Navigation clavier fluide
+══════════════════════════════════════════════════ */
+document.getElementById('loginEmail').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('loginPass').focus();
+});
+document.getElementById('loginPass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+document.getElementById('signupEmail').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('signupPass').focus();
+});
+document.getElementById('signupPass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('signupConfirm').focus();
+});
+document.getElementById('signupConfirm').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('signupRef').focus();
+});
+document.getElementById('signupRef').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSignup();
 });
 
-/* ══════════════════════════════════════
-   INSCRIPTION
-══════════════════════════════════════ */
-async function doSignup(){
-  clrMsg('sM');
-  const email=document.getElementById('sE').value.trim();
-  const pass =document.getElementById('sP').value;
-  const conf =document.getElementById('sC').value;
-  const ref  =document.getElementById('sR').value.trim();
+/* ══════════════════════════════════════════════════
+   ㉑ VÉRIFICATION SESSION EXISTANTE
+   Si un token valide est déjà stocké → redirection
+   directe vers le dashboard sans passer par la connexion.
+══════════════════════════════════════════════════ */
+(function checkExistingSession() {
+  const token     = localStorage.getItem('gi_access_token');
+  const savedTime = localStorage.getItem('gi_session_time');
 
-  if(!email) return showMsg('sM','⚠️ Entrez votre e-mail.','e');
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showMsg('sM','⚠️ E-mail invalide.','e');
-  if(pass.length<8) return showMsg('sM','⚠️ Mot de passe : 8 caractères minimum.','e');
-  if(pass!==conf) return showMsg('sM','⚠️ Les mots de passe ne correspondent pas.','e');
+  if (token && savedTime) {
+    const sessionAge = Date.now() - new Date(savedTime).getTime();
+    const ONE_HOUR   = 3600 * 1000;
 
-  setBtn('sB',true,'Créer mon compte');
-  try{
-    const d=await sb('signup',{
-      email, password:pass,
-      options:{data:{referral_code:ref||null}}
-    });
-    if(d.error) showMsg('sM',frE(d.error.message),'e');
-    else{
-      showMsg('sM','✅ Compte créé ! Code envoyé à '+email,'s');
-      setTimeout(()=>showOTP(email),700);
-    }
-  }catch{showMsg('sM','❌ Erreur réseau.','e');}
-  finally{setBtn('sB',false,'Créer mon compte');}
-}
-
-/* ══════════════════════════════════════
-   CONNEXION
-══════════════════════════════════════ */
-async function doLogin(){
-  clrMsg('lM');
-  const email=document.getElementById('lE').value.trim();
-  const pass =document.getElementById('lP').value;
-
-  if(!email||!pass) return showMsg('lM','⚠️ E-mail et mot de passe requis.','e');
-
-  setBtn('lB',true,'Entrer dans la galaxie');
-  try{
-    const d=await sb('token?grant_type=password',{email,password:pass});
-    if(d.error) showMsg('lM',frE(d.error.message),'e');
-    else{
-      // Session sauvegardée
-      localStorage.setItem('gi_access', d.access_token);
-      localStorage.setItem('gi_refresh',d.refresh_token);
-      localStorage.setItem('gi_user',   JSON.stringify(d.user||{}));
-      showMsg('lM','✅ Connexion réussie !','s');
-      setTimeout(()=>showSuccess(null,false),600);
-    }
-  }catch{showMsg('lM','❌ Erreur réseau.','e');}
-  finally{setBtn('lB',false,'Entrer dans la galaxie');}
-}
-
-/* ══════════════════════════════════════
-   VÉRIFICATION OTP
-   → Supabase vérifie le code côté serveur.
-   → Code faux = erreur retournée.
-   → Code juste = access_token reçu.
-══════════════════════════════════════ */
-async function doOTP(){
-  clrMsg('oM');
-  const inputs=document.querySelectorAll('#BX input');
-  const token=[...inputs].map(i=>i.value).join('');
-
-  if(token.length!==6) return showMsg('oM','⚠️ Entrez les 6 chiffres.','e');
-  if(Date.now()>expEnd&&expEnd>0) return showMsg('oM','⏰ Code expiré. Renvoyez-en un.','e');
-
-  setBtn('oB',true,'Valider');
-  try{
-    // Supabase vérifie — seul le vrai code envoyé par mail fonctionne
-    const d=await sb('verify',{type:'signup',email:EMAIL,token});
-
-    if(d.error){
-      // ❌ Mauvais code → cases rouges + vidage
-      showMsg('oM',frE(d.error.message),'e');
-      inputs.forEach(i=>{i.classList.add('ko');i.classList.remove('ok');});
-      setTimeout(()=>{
-        inputs.forEach(i=>{i.value='';i.classList.remove('ko','ok');});
-        inputs[0].focus();
-      },500);
+    // Session valide si moins d'1h (Supabase expire après ~1h)
+    if (sessionAge < ONE_HOUR) {
+      const email = localStorage.getItem('gi_user_email') || '';
+      // Décommente pour rediriger automatiquement :
+      // showSuccess(email);
+      // setTimeout(() => { window.location.href = '/dashboard.html'; }, 1000);
     } else {
-      // ✅ Bon code → on sauve la session et on revient sur connexion
-      localStorage.setItem('gi_access', d.access_token||'');
-      localStorage.setItem('gi_refresh',d.refresh_token||'');
-      clearInterval(expTmr);
-      showMsg('oM','✅ Code validé !','s');
-      setTimeout(()=>showSuccess(null,true),700);
+      // Session expirée → nettoyage
+      localStorage.removeItem('gi_access_token');
+      localStorage.removeItem('gi_refresh_token');
+      localStorage.removeItem('gi_user_email');
+      localStorage.removeItem('gi_user_data');
+      localStorage.removeItem('gi_session_time');
     }
-  }catch{showMsg('oM','❌ Erreur réseau.','e');}
-  finally{setBtn('oB',false,'Valider');}
-}
-
-/* ══════════════════════════════════════
-   RENVOYER OTP
-══════════════════════════════════════ */
-async function doResend(){
-  document.getElementById('RB').disabled=true;
-  clrMsg('oM');
-  try{
-    const d=await sb('resend',{type:'signup',email:EMAIL});
-    if(d.error){showMsg('oM',frE(d.error.message),'e');document.getElementById('RB').disabled=false;}
-    else{showMsg('oM','📡 Nouveau code envoyé à '+EMAIL,'s');resetBoxes();startCountdown(60);startExpiry();document.querySelectorAll('#BX input')[0].focus();}
-  }catch{showMsg('oM','❌ Impossible de renvoyer.','e');document.getElementById('RB').disabled=false;}
-}
-
-/* ══════════════════════════════════════
-   TOUCHE ENTRÉE
-══════════════════════════════════════ */
-document.getElementById('lP').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
-document.getElementById('lE').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('lP').focus();});
-document.getElementById('sC').addEventListener('keydown',e=>{if(e.key==='Enter')doSignup();});
-document.getElementById('sR').addEventListener('keydown',e=>{if(e.key==='Enter')doSignup();});
+  }
+})();
 </script>
 </body>
 </html>

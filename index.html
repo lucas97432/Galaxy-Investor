@@ -1198,8 +1198,11 @@ async function doLogin() {
 }
 
 /* ══════════════════════════════════════════════════
-   ⑱ VÉRIFICATION OTP — CORRIGÉE & SÉCURISÉE
-   Le succès ne se déclenche QUE si Supabase valide.
+   ⑱ VÉRIFICATION OTP — STRICTE PAR SUPABASE
+   Le code saisi est envoyé à Supabase.
+   Supabase compare avec le VRAI code généré.
+   → Code faux  = erreur retournée, cases secouées
+   → Code juste = session créée, retour connexion
 ══════════════════════════════════════════════════ */
 async function doVerifyOTP() {
   clearMsg('otpMsg');
@@ -1207,77 +1210,69 @@ async function doVerifyOTP() {
   const boxes = document.querySelectorAll('.otp-box');
   const token = [...boxes].map(b => b.value).join('');
 
-  // 1. Vérification de base (Client-side)
-  if (token.length !== 6) {
+  if (token.length !== 6)
     return showMsg('otpMsg', '⚠️ Entrez les 6 chiffres du code.', 'error');
-  }
 
   // Vérification expiration locale
-  if (STATE.expEndTime > 0 && Date.now() > STATE.expEndTime) {
-    return showMsg('otpMsg', '⏰ Code expiré. Cliquez sur "Renvoyer".', 'error');
-  }
+  if (STATE.expEndTime > 0 && Date.now() > STATE.expEndTime)
+    return showMsg('otpMsg', '⏰ Code expiré. Cliquez sur "Renvoyer un code".', 'error');
 
-  setLoading('otpBtn', true, 'Vérification...');
+  setLoading('otpBtn', true, 'Valider le code');
 
   try {
-    // 2. APPEL RÉEL À SUPABASE
+    // ← APPEL SUPABASE VERIFY
+    // Supabase vérifie que `token` correspond exactement
+    // au code OTP qu'il a généré et envoyé par mail.
+    // Si le code ne correspond pas → data.error est retourné.
+    // Aucun contournement possible côté client.
     const data = await supabaseCall('verify', {
-      type : 'signup',
+      type : STATE.mode,  // 'signup'
       email: STATE.email,
-      token: token
+      token: token,       // ← le code tapé par l'utilisateur
     });
 
-    // 3. GESTION DE L'ERREUR (Le moment où on bloque l'imposteur)
-    // On vérifie si Supabase renvoie une erreur ou un message d'échec
-    if (data.error || (data.message && data.message.includes("invalid"))) {
-      
-      showMsg('otpMsg', '❌ Code incorrect. Tentative refusée.', 'error');
+    if (data.error) {
+      // ❌ CODE INCORRECT — Supabase a refusé
+      showMsg('otpMsg', translateError(data.error.message), 'error');
 
-      // On met les cases en rouge ("bad")
-      boxes.forEach(b => {
-        b.classList.add('bad');
-        b.classList.remove('filled');
-      });
-
-      // On attend 0.8s, puis on vide les cases pour retenter
+      // Animation d'erreur sur les cases
+      boxes.forEach(b => b.classList.add('bad'));
       setTimeout(() => {
         boxes.forEach(b => {
+          b.classList.remove('bad', 'filled');
           b.value = '';
-          b.classList.remove('bad');
         });
         boxes[0].focus();
-      }, 800);
+      }, 550);
 
-      return; // ⛔ STOP : On sort de la fonction ici, rien de la suite ne s'exécute.
+    } else {
+      // ✅ CODE CORRECT — Supabase a validé
+      clearInterval(STATE.expTimer);
+
+      // Mettre les cases en vert
+      boxes.forEach(b => { b.classList.add('valid'); b.classList.remove('filled', 'bad'); });
+
+      // Sauvegarder la session si token reçu
+      if (data.access_token) {
+        localStorage.setItem('gi_access_token',  data.access_token);
+        localStorage.setItem('gi_refresh_token', data.refresh_token || '');
+        localStorage.setItem('gi_user_email',    STATE.email);
+        localStorage.setItem('gi_user_data',     JSON.stringify(data.user || {}));
+      }
+
+      showMsg('otpMsg', '✅ Code validé ! Compte activé.', 'success');
+
+      // Retour vers l'onglet Connexion avec email prérempli
+      setTimeout(() => {
+        clearInterval(STATE.resendTimer);
+        document.getElementById('otpPanel').classList.remove('active');
+        document.getElementById('tabsBar').style.display = 'flex';
+        switchTab('login');
+        document.getElementById('loginEmail').value = STATE.email;
+        showMsg('loginMsg', '✅ Compte activé ! Entrez votre mot de passe pour vous connecter.', 'success');
+        document.getElementById('loginPass').focus();
+      }, 900);
     }
-
-    // 4. SUCCÈS RÉEL (Uniquement si on arrive ici sans erreur)
-    clearInterval(STATE.expTimer);
-    
-    // Feedback visuel de réussite (Vert)
-    boxes.forEach(b => { 
-      b.classList.add('valid'); 
-      b.classList.remove('filled', 'bad'); 
-    });
-
-    // Sauvegarde de la session pour rester connecté
-    if (data.access_token) {
-      localStorage.setItem('gi_access_token',  data.access_token);
-      localStorage.setItem('gi_user_email',    STATE.email);
-      localStorage.setItem('gi_session_time',  new Date().toISOString());
-    }
-
-    showMsg('otpMsg', '✅ Code validé ! Compte activé.', 'success');
-
-    // Retour vers l'onglet Connexion pour entrer le mot de passe
-    setTimeout(() => {
-      document.getElementById('otpPanel').classList.remove('active');
-      document.getElementById('tabsBar').style.display = 'flex';
-      switchTab('login');
-      document.getElementById('loginEmail').value = STATE.email;
-      showMsg('loginMsg', '✅ Compte activé ! Connectez-vous Pilote.', 'success');
-      document.getElementById('loginPass').focus();
-    }, 1500);
 
   } catch (e) {
     showMsg('otpMsg', '❌ Erreur réseau. Réessayez.', 'error');
@@ -1285,6 +1280,7 @@ async function doVerifyOTP() {
     setLoading('otpBtn', false, 'Valider le code');
   }
 }
+
 /* ══════════════════════════════════════════════════
    ⑲ RENVOYER UN CODE OTP
    Appel Supabase /auth/v1/resend

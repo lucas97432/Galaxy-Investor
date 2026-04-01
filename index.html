@@ -1,1293 +1,1546 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-<meta name="theme-color" content="#030014">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>ORION AI | Galaxy Investor — Plateforme d'Investissement Spatial V10</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Space+Grotesk:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<style>
-/* ==================================================
-   VARIABLES & RESET
-================================================== */
-:root {
-    --bg-primary: #030014;
-    --bg-secondary: #0a0a1a;
-    --bg-glass: rgba(10, 14, 26, 0.65);
-    --bg-glass-solid: rgba(5, 8, 22, 0.95);
-    --gold: #f5b042;
-    --gold-dim: rgba(245, 176, 66, 0.15);
-    --gold-glow: rgba(245, 176, 66, 0.4);
-    --text-primary: #ffffff;
-    --text-secondary: #8a9bb5;
-    --text-muted: #4a5a7a;
-    --green: #20d07a;
-    --green-dim: rgba(32, 208, 122, 0.15);
-    --red: #f04e6a;
-    --blue: #3a86ff;
-    --purple: #9b4dff;
-    --border: 1px solid rgba(245, 176, 66, 0.1);
-    --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    --radius: 24px;
-    --radius-sm: 14px;
-    --transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-}
-
-body {
-    font-family: 'Inter', sans-serif;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    overflow: hidden;
-    height: 100vh;
-}
-
-/* Canvas Three.js */
-#canvas3d {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-}
-
-/* Overlay gradient */
-.overlay {
-    position: fixed;
-    inset: 0;
-    background: radial-gradient(circle at 50% 30%, rgba(3, 0, 20, 0.3) 0%, rgba(3, 0, 20, 0.85) 100%);
-    pointer-events: none;
-    z-index: 1;
-}
-
-/* ==================================================
-   AUTH SCENE
-================================================== */
-.auth-scene {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    transition: opacity 0.5s ease, visibility 0.5s;
-}
-
-.auth-card {
-    max-width: 480px;
-    width: 100%;
-    background: var(--bg-glass);
-    backdrop-filter: blur(20px);
-    border: var(--border);
-    border-radius: var(--radius);
-    padding: 32px;
-    box-shadow: var(--shadow);
-    animation: fadeInUp 0.6s ease;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(40px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.auth-logo {
-    text-align: center;
-    margin-bottom: 32px;
-}
-
-.auth-logo-icon {
-    font-size: 3.5rem;
-    filter: drop-shadow(0 0 20px var(--gold-glow));
-    animation: float 4s ease-in-out infinite;
-}
-
-.auth-logo-text {
-    font-family: 'Orbitron', monospace;
-    font-size: 1.4rem;
-    font-weight: 800;
-    letter-spacing: 0.2em;
-    background: linear-gradient(135deg, var(--gold), #ffdd99);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    margin-top: 8px;
-}
-
-.auth-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 24px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 60px;
-    padding: 4px;
-}
-
-.auth-tab {
-    flex: 1;
-    padding: 12px;
-    background: transparent;
-    border: none;
-    border-radius: 60px;
-    color: var(--text-muted);
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.auth-tab.active {
-    background: var(--gold-dim);
-    color: var(--gold);
-}
-
-.auth-form {
-    display: none;
-}
-
-.auth-form.active {
-    display: block;
-    animation: fadeIn 0.3s ease;
-}
-
-.input-group {
-    margin-bottom: 20px;
-}
-
-.input-label {
-    display: block;
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-}
-
-.input-wrapper {
-    position: relative;
-}
-
-.input-field {
-    width: 100%;
-    padding: 14px 48px 14px 16px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(245, 176, 66, 0.2);
-    border-radius: 16px;
-    color: var(--text-primary);
-    font-size: 0.9rem;
-    outline: none;
-    transition: var(--transition);
-}
-
-.input-field:focus {
-    border-color: var(--gold);
-    background: rgba(245, 176, 66, 0.05);
-    box-shadow: 0 0 0 3px rgba(245, 176, 66, 0.1);
-}
-
-.eye-btn {
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    font-size: 1rem;
-}
-
-.btn-primary {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(135deg, var(--gold), #ffdd99);
-    border: none;
-    border-radius: 40px;
-    color: var(--bg-primary);
-    font-weight: 700;
-    font-size: 0.8rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: var(--transition);
-    margin-top: 8px;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(245, 176, 66, 0.3);
-}
-
-.message {
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    margin-top: 12px;
-    display: none;
-}
-
-.message.error {
-    background: var(--red-dim);
-    border: 1px solid rgba(240, 78, 106, 0.3);
-    color: var(--red);
-    display: block;
-}
-
-.message.success {
-    background: var(--green-dim);
-    border: 1px solid rgba(32, 208, 122, 0.3);
-    color: var(--green);
-    display: block;
-}
-
-/* OTP Panel */
-.otp-panel {
-    display: none;
-    text-align: center;
-}
-
-.otp-panel.active {
-    display: block;
-}
-
-.otp-boxes {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    margin: 24px 0;
-}
-
-.otp-box {
-    width: 52px;
-    height: 60px;
-    text-align: center;
-    font-size: 1.4rem;
-    font-weight: 700;
-    font-family: 'Orbitron', monospace;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(245, 176, 66, 0.3);
-    border-radius: 16px;
-    color: var(--gold);
-    outline: none;
-}
-
-.otp-box:focus {
-    border-color: var(--gold);
-    box-shadow: 0 0 0 3px rgba(245, 176, 66, 0.2);
-}
-
-/* ==================================================
-   DASHBOARD
-================================================== */
-.dashboard {
-    position: fixed;
-    inset: 0;
-    z-index: 50;
-    display: none;
-    overflow: hidden;
-}
-
-.dashboard.active {
-    display: flex;
-}
-
-/* Sidebar */
-.sidebar {
-    width: 280px;
-    background: var(--bg-glass);
-    backdrop-filter: blur(20px);
-    border-right: var(--border);
-    display: flex;
-    flex-direction: column;
-    padding: 28px 20px;
-    z-index: 60;
-}
-
-.logo-sidebar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 40px;
-    padding-bottom: 20px;
-    border-bottom: var(--border);
-}
-
-.logo-sidebar-icon {
-    font-size: 2rem;
-}
-
-.logo-sidebar-text {
-    font-family: 'Orbitron', monospace;
-    font-weight: 800;
-    font-size: 0.9rem;
-    letter-spacing: 0.1em;
-}
-
-.nav-menu {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 12px 16px;
-    background: transparent;
-    border: none;
-    border-radius: 14px;
-    color: var(--text-secondary);
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: var(--transition);
-    text-align: left;
-}
-
-.nav-item:hover, .nav-item.active {
-    background: var(--gold-dim);
-    color: var(--gold);
-    transform: translateX(4px);
-}
-
-.nav-icon {
-    font-size: 1.2rem;
-}
-
-.user-stats-sidebar {
-    margin-top: auto;
-    padding-top: 20px;
-    border-top: var(--border);
-}
-
-.xp-bar {
-    height: 4px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    margin: 8px 0;
-    overflow: hidden;
-}
-
-.xp-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--gold), #ffdd99);
-    width: 0%;
-    transition: width 0.5s ease;
-}
-
-/* Main Content */
-.main-content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 28px 32px;
-}
-
-/* IA Panel */
-.ia-panel {
-    width: 380px;
-    background: var(--bg-glass);
-    backdrop-filter: blur(20px);
-    border-left: var(--border);
-    display: flex;
-    flex-direction: column;
-    z-index: 60;
-}
-
-.ia-header {
-    padding: 24px 20px;
-    border-bottom: var(--border);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.ia-avatar {
-    width: 56px;
-    height: 56px;
-    background: linear-gradient(135deg, var(--gold), #ffdd99);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    animation: pulseGlow 2s ease infinite;
-}
-
-.ia-title h3 {
-    font-family: 'Orbitron', monospace;
-    font-size: 1rem;
-    color: var(--gold);
-}
-
-.ia-title p {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-}
-
-.ia-messages-container {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-.ia-message {
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 18px;
-    border-left: 3px solid var(--gold);
-    animation: slideIn 0.3s ease;
-}
-
-.ia-message.orion {
-    border-left-color: var(--purple);
-}
-
-.ia-message.user {
-    background: var(--gold-dim);
-    border-left-color: var(--gold);
-    align-self: flex-end;
-}
-
-.ia-message-text {
-    font-size: 0.8rem;
-    line-height: 1.5;
-    color: var(--text-secondary);
-}
-
-.ia-input-area {
-    padding: 16px 20px;
-    border-top: var(--border);
-    display: flex;
-    gap: 10px;
-}
-
-.ia-input {
-    flex: 1;
-    padding: 12px 16px;
-    background: rgba(255, 255, 255, 0.05);
-    border: var(--border);
-    border-radius: 40px;
-    color: var(--text-primary);
-    font-size: 0.8rem;
-    outline: none;
-}
-
-.ia-send {
-    width: 44px;
-    height: 44px;
-    background: var(--gold-dim);
-    border: none;
-    border-radius: 50%;
-    color: var(--gold);
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-/* Stats Grid */
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 32px;
-}
-
-.stat-card {
-    background: var(--bg-glass);
-    backdrop-filter: blur(10px);
-    border: var(--border);
-    border-radius: 20px;
-    padding: 20px;
-    transition: var(--transition);
-}
-
-.stat-card:hover {
-    border-color: var(--gold-dim);
-    transform: translateY(-2px);
-}
-
-.stat-label {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    letter-spacing: 0.1em;
-}
-
-.stat-value {
-    font-size: 1.6rem;
-    font-weight: 700;
-    font-family: 'Orbitron', monospace;
-    color: var(--gold);
-    margin-top: 8px;
-}
-
-/* Planets Grid */
-.planets-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
-    margin-bottom: 32px;
-}
-
-.planet-card {
-    background: var(--bg-glass);
-    backdrop-filter: blur(10px);
-    border: var(--border);
-    border-radius: 20px;
-    padding: 20px;
-    transition: var(--transition);
-    cursor: pointer;
-}
-
-.planet-card:hover {
-    border-color: var(--gold);
-    transform: translateY(-4px);
-}
-
-.buy-btn {
-    width: 100%;
-    padding: 10px;
-    background: var(--gold-dim);
-    border: none;
-    border-radius: 40px;
-    color: var(--gold);
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    margin-top: 12px;
-}
-
-/* Education Section */
-.course-card {
-    background: var(--bg-glass);
-    border: var(--border);
-    border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 16px;
-}
-
-.course-progress {
-    height: 6px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
-    margin: 12px 0;
-    overflow: hidden;
-}
-
-.course-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--gold), #ffdd99);
-    width: 0%;
-    border-radius: 3px;
-}
-
-/* Profile Section */
-.profile-header {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    margin-bottom: 32px;
-    padding: 24px;
-    background: var(--bg-glass);
-    border-radius: 28px;
-}
-
-.profile-avatar {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, var(--gold), #ffdd99);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-}
-
-/* Mobile Bottom Nav */
-.bottom-nav {
-    display: none;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--bg-glass-solid);
-    backdrop-filter: blur(20px);
-    border-top: var(--border);
-    padding: 10px 20px 24px;
-    justify-content: space-around;
-    z-index: 70;
-}
-
-.bottom-nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    font-size: 0.6rem;
-    cursor: pointer;
-    padding: 6px 12px;
-    border-radius: 40px;
-}
-
-.bottom-nav-item.active {
-    color: var(--gold);
-    background: var(--gold-dim);
-}
-
-.floating-ia-btn {
-    display: none;
-    position: fixed;
-    bottom: 90px;
-    right: 20px;
-    width: 56px;
-    height: 56px;
-    background: linear-gradient(135deg, var(--gold), #ffdd99);
-    border-radius: 50%;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.6rem;
-    cursor: pointer;
-    z-index: 70;
-    box-shadow: 0 4px 20px rgba(245, 176, 66, 0.4);
-}
-
-.mobile-ia-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.95);
-    z-index: 200;
-    flex-direction: column;
-    padding: 20px;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-}
-
-@keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 5px var(--gold); }
-    50% { box-shadow: 0 0 20px var(--gold); }
-}
-
-@keyframes slideIn {
-    from { opacity: 0; transform: translateX(-10px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-
-/* Responsive */
-@media (max-width: 1024px) {
-    .sidebar { width: 80px; padding: 20px 12px; }
-    .logo-sidebar-text, .nav-item span:last-child, .user-stats-sidebar { display: none; }
-    .nav-item { justify-content: center; padding: 12px; }
-    .nav-icon { font-size: 1.4rem; }
-    .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    .ia-panel { width: 320px; }
-}
-
-@media (max-width: 768px) {
-    .sidebar, .ia-panel { display: none; }
-    .bottom-nav, .floating-ia-btn { display: flex; }
-    .main-content { padding: 20px 16px 100px; }
-    .stats-grid { grid-template-columns: 1fr; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <meta name="theme-color" content="#0a0a2a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Galaxy Investor Pro | Plateforme de Trading Spatial</title>
+    
+    <!-- Google Fonts Premium -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome 6 Pro (Style complet) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* ========================================================================
+           PARTIE 1.1: VARIABLES GLOBALES & SYSTÈME DE DESIGN
+        ======================================================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            /* Couleurs principales - Palette Spatiale Premium */
+            --gold-primary: #f5b042;
+            --gold-glow: #ffd966;
+            --gold-dark: #b87c1a;
+            --gold-neon: rgba(245, 176, 66, 0.6);
+            --gold-shine: rgba(255, 217, 102, 0.8);
+            
+            /* Couleurs spatiales profondes */
+            --space-deep: #030014;
+            --space-mid: #0a0a2a;
+            --space-light: #12123a;
+            --nebula-purple: rgba(139, 92, 246, 0.4);
+            --nebula-blue: rgba(59, 130, 246, 0.3);
+            --nebula-pink: rgba(236, 72, 153, 0.2);
+            
+            /* Glassmorphism 2.0 */
+            --glass-bg: rgba(10, 20, 45, 0.55);
+            --glass-border: rgba(245, 176, 66, 0.25);
+            --glass-blur: blur(20px);
+            --glass-blur-strong: blur(30px);
+            
+            /* Statuts */
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.3);
+            --error: #ef4444;
+            --error-glow: rgba(239, 68, 68, 0.3);
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            
+            /* Textes */
+            --text-primary: #ffffff;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --text-gold: #f5b042;
+            
+            /* Ombres & Effets */
+            --shadow-gold: 0 0 20px rgba(245, 176, 66, 0.4);
+            --shadow-glow: 0 0 40px rgba(245, 176, 66, 0.2);
+            --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            --shadow-inner: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            
+            /* Transitions */
+            --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            --transition-spring: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            
+            /* Dimensions */
+            --sidebar-width: 300px;
+            --header-height: 80px;
+            --border-radius-lg: 32px;
+            --border-radius-md: 24px;
+            --border-radius-sm: 16px;
+        }
+
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--space-deep);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+            cursor: default;
+        }
+
+        /* ========================================================================
+           PARTIE 1.2: DESIGN 3D AVANCÉ - PLANÈTE CENTRALE AVEC ANNEAUX
+        ======================================================================== */
+        #canvas-3d {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .cosmic-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, 
+                        transparent 0%, 
+                        rgba(3, 0, 20, 0.3) 40%,
+                        rgba(3, 0, 20, 0.7) 70%,
+                        rgba(3, 0, 20, 0.95) 100%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .stars-field {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        /* Particules flottantes */
+        .floating-particles {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            background: radial-gradient(circle, var(--gold-primary), transparent);
+            border-radius: 50%;
+            opacity: 0;
+            animation: floatParticle 20s ease-in-out infinite;
+        }
+
+        @keyframes floatParticle {
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) scale(0);
+            }
+            10% {
+                opacity: 0.6;
+            }
+            80% {
+                opacity: 0.4;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-20vh) scale(1);
+            }
+        }
+
+        /* ========================================================================
+           PARTIE 1.3: GLASSMORPHISM 2.0 AVEC EFFETS GOLD-NEON
+        ======================================================================== */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-card), var(--shadow-inner);
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                        transparent, 
+                        rgba(245, 176, 66, 0.1), 
+                        transparent);
+            transition: left 0.6s ease;
+        }
+
+        .glass-card:hover::before {
+            left: 100%;
+        }
+
+        .glass-card:hover {
+            border-color: var(--gold-primary);
+            box-shadow: var(--shadow-gold);
+            transform: translateY(-4px);
+        }
+
+        /* Effet gold-neon animé */
+        .gold-neon-border {
+            position: relative;
+            border-radius: var(--border-radius-lg);
+        }
+
+        .gold-neon-border::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            background: linear-gradient(135deg, 
+                        transparent 30%, 
+                        var(--gold-primary) 50%, 
+                        transparent 70%);
+            border-radius: var(--border-radius-lg);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+        }
+
+        .gold-neon-border:hover::after {
+            opacity: 0.3;
+            animation: neonPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes neonPulse {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.5; }
+        }
+
+        /* ========================================================================
+           PARTIE 1.4: BOUTONS AVANCÉS AVEC MICRO-INTERACTIONS
+        ======================================================================== */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold-primary), var(--gold-glow));
+            border: none;
+            border-radius: 60px;
+            padding: 14px 32px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--space-deep);
+            cursor: pointer;
+            transition: var(--transition-spring);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(245, 176, 66, 0.3);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                        transparent, 
+                        rgba(255, 255, 255, 0.4), 
+                        transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 30px rgba(245, 176, 66, 0.5);
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1.5px solid var(--gold-primary);
+            border-radius: 60px;
+            padding: 12px 28px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            color: var(--gold-primary);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(245, 176, 66, 0.15);
+            box-shadow: 0 0 20px rgba(245, 176, 66, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* ========================================================================
+           PARTIE 1.5: CHAMPS DE SAISIE AVEC EFFETS MODERNES
+        ======================================================================== */
+        .input-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 14px 48px 14px 18px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(245, 176, 66, 0.2);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-primary);
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.95rem;
+            transition: var(--transition-smooth);
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: var(--gold-primary);
+            background: rgba(245, 176, 66, 0.05);
+            box-shadow: 0 0 0 4px rgba(245, 176, 66, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+            transition: var(--transition-smooth);
+        }
+
+        .input-field:focus + .input-icon {
+            color: var(--gold-primary);
+        }
+
+        /* Force du mot de passe */
+        .password-strength {
+            margin-top: 8px;
+        }
+
+        .strength-bar-container {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease, background 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .strength-text {
+            font-size: 0.65rem;
+            margin-top: 6px;
+            color: var(--text-muted);
+        }
+
+        /* ========================================================================
+           PARTIE 1.6: STRUCTURE PRINCIPALE & NAVIGATION
+        ======================================================================== */
+        .app-container {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+        }
+
+        /* Sidebar premium */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur-strong);
+            border-right: 1px solid var(--glass-border);
+            transform: translateX(-100%);
+            transition: var(--transition-smooth);
+            z-index: 100;
+            overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 32px 24px;
+            text-align: center;
+            border-bottom: 1px solid var(--glass-border);
+            position: relative;
+        }
+
+        .sidebar-logo {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-glow));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 0.1em;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+            letter-spacing: 0.2em;
+        }
+
+        .sidebar-nav {
+            padding: 24px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            margin-bottom: 8px;
+            border-radius: var(--border-radius-md);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: var(--gold-primary);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item:hover {
+            background: rgba(245, 176, 66, 0.1);
+            color: var(--gold-primary);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(245, 176, 66, 0.15), transparent);
+            color: var(--gold-primary);
+        }
+
+        .nav-item.active::before {
+            transform: scaleY(1);
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+            width: 28px;
+            text-align: center;
+        }
+
+        /* Main content */
+        .main-content {
+            margin-left: 0;
+            transition: var(--transition-smooth);
+            min-height: 100vh;
+        }
+
+        .main-content.sidebar-open {
+            margin-left: var(--sidebar-width);
+        }
+
+        /* Header premium */
+        .app-header {
+            position: sticky;
+            top: 0;
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur-strong);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 0 28px;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 50;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 12px;
+            transition: var(--transition-smooth);
+        }
+
+        .menu-toggle:hover {
+            background: rgba(245, 176, 66, 0.1);
+            color: var(--gold-primary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-rank {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(245, 176, 66, 0.1);
+            border-radius: 60px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gold-primary);
+            font-family: 'Orbitron', monospace;
+        }
+
+        .user-balance {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 60px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+            padding: 32px;
+            animation: pageEnter 0.5s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes pageEnter {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ========================================================================
+           PARTIE 1.7: COMPOSANTS SPÉCIFIQUES
+        ======================================================================== */
+        /* Cartes de statistiques */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            padding: 24px;
+            text-align: center;
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            color: var(--gold-primary);
+            margin-bottom: 12px;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 8px 0;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        /* Module IA Orion */
+        .orion-module {
+            background: linear-gradient(135deg, 
+                        rgba(139, 92, 246, 0.15), 
+                        rgba(59, 130, 246, 0.08));
+            border-radius: var(--border-radius-lg);
+            padding: 24px;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            margin-bottom: 32px;
+        }
+
+        .orion-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .orion-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-glow));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(245, 176, 66, 0.4); }
+            50% { box-shadow: 0 0 0 15px rgba(245, 176, 66, 0); }
+        }
+
+        .orion-bubble {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 16px 20px;
+            position: relative;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .orion-bubble::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            bottom: -10px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Cartes planètes */
+        .planets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .planet-card {
+            padding: 20px;
+            cursor: pointer;
+        }
+
+        .planet-emoji {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .planet-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .planet-price {
+            text-align: center;
+            color: var(--gold-primary);
+            font-weight: 700;
+            margin: 8px 0;
+        }
+
+        .planet-roi {
+            text-align: center;
+            color: var(--success);
+            font-size: 0.85rem;
+        }
+
+        /* Notifications */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .notification {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur-strong);
+            border-left: 4px solid;
+            border-radius: var(--border-radius-md);
+            padding: 14px 20px;
+            margin-bottom: 12px;
+            transform: translateX(400px);
+            transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success { border-left-color: var(--success); }
+        .notification.error { border-left-color: var(--error); }
+        .notification.info { border-left-color: var(--info); }
+
+        /* Loader */
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(245, 176, 66, 0.3);
+            border-top-color: var(--gold-primary);
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar personnalisée */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--space-mid);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold-primary);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gold-glow);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            :root {
+                --sidebar-width: 280px;
+            }
+            .page {
+                padding: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content.sidebar-open {
+                margin-left: 0;
+            }
+            .page {
+                padding: 16px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            .user-rank span, .user-balance span {
+                display: none;
+            }
+            .app-header {
+                padding: 0 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .btn-primary, .btn-secondary {
+                padding: 10px 20px;
+                font-size: 0.7rem;
+            }
+            .stat-value {
+                font-size: 1.5rem;
+            }
+            .planets-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations globales */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        /* Effet de texte scintillant */
+        .glow-text {
+            background: linear-gradient(90deg, var(--gold-primary), var(--gold-glow), var(--gold-primary));
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: shimmer 3s linear infinite;
+        }
+    </style>
 </head>
 <body>
 
-<div id="canvas3d"></div>
-<div class="overlay"></div>
+    <!-- Canvas 3D pour la planète centrale -->
+    <canvas id="canvas-3d"></canvas>
+    <div class="cosmic-overlay"></div>
+    <div class="stars-field" id="starsField"></div>
+    <div class="floating-particles" id="floatingParticles"></div>
 
-<!-- AUTH SCENE -->
-<div class="auth-scene" id="authScene">
-    <div class="auth-card">
-        <div class="auth-logo">
-            <div class="auth-logo-icon">🪐</div>
-            <div class="auth-logo-text">GALAXY INVESTOR</div>
-            <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 8px;">Powered by ORION AI</div>
-        </div>
+    <!-- Application Container -->
+    <div class="app-container" id="appContainer">
         
-        <div class="auth-tabs">
-            <button class="auth-tab active" data-tab="login">Connexion</button>
-            <button class="auth-tab" data-tab="register">Inscription</button>
-        </div>
+        <!-- Sidebar Navigation Premium -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-rocket"></i> GALAXY INVESTOR
+                </div>
+                <div class="sidebar-subtitle">
+                    PLATEFORME DE TRADING SPATIAL
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-item active" data-page="dashboard">
+                    <div class="nav-icon"><i class="fas fa-chart-line"></i></div>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item" data-page="market">
+                    <div class="nav-icon"><i class="fas fa-globe"></i></div>
+                    <span>Marché des Planètes</span>
+                </div>
+                <div class="nav-item" data-page="portfolio">
+                    <div class="nav-icon"><i class="fas fa-wallet"></i></div>
+                    <span>Mon Portefeuille</span>
+                </div>
+                <div class="nav-item" data-page="academy">
+                    <div class="nav-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <span>Académie Financière</span>
+                </div>
+                <div class="nav-item" data-page="referral">
+                    <div class="nav-icon"><i class="fas fa-users"></i></div>
+                    <span>Parrainage</span>
+                </div>
+                <div class="nav-item" data-page="profile">
+                    <div class="nav-icon"><i class="fas fa-user-astronaut"></i></div>
+                    <span>Mon Profil</span>
+                </div>
+            </nav>
+        </aside>
         
-        <!-- Login Form -->
-        <div class="auth-form active" id="loginForm">
-            <div class="input-group">
-                <label class="input-label">E-mail</label>
-                <div class="input-wrapper">
-                    <input type="email" class="input-field" id="loginEmail" placeholder="pilote@galaxie.io">
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <header class="app-header">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="user-info">
+                    <div class="user-rank" id="userRankDisplay">
+                        <i class="fas fa-star"></i>
+                        <span>RECRUE</span>
+                    </div>
+                    <div class="user-balance" id="userBalanceDisplay">
+                        <i class="fas fa-coins"></i>
+                        <span>0.00 €</span>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- PAGE DASHBOARD -->
+            <div class="page active" id="page-dashboard">
+                <div style="max-width: 1400px; margin: 0 auto;">
+                    <h1 style="margin-bottom: 8px;">Tableau de bord spatial</h1>
+                    <p style="color: var(--text-secondary); margin-bottom: 32px;">Bienvenue, Pilote. Votre empire galactique vous attend.</p>
+                    
+                    <!-- Statistiques -->
+                    <div class="stats-grid">
+                        <div class="glass-card stat-card">
+                            <div class="stat-icon"><i class="fas fa-coins"></i></div>
+                            <div class="stat-value" id="statBalance">0.00 €</div>
+                            <div class="stat-label">Solde Total</div>
+                        </div>
+                        <div class="glass-card stat-card">
+                            <div class="stat-icon"><i class="fas fa-chart-simple"></i></div>
+                            <div class="stat-value" id="statProfit">0.00 €</div>
+                            <div class="stat-label">Profits Totaux</div>
+                        </div>
+                        <div class="glass-card stat-card">
+                            <div class="stat-icon"><i class="fas fa-star"></i></div>
+                            <div class="stat-value" id="statXP">0</div>
+                            <div class="stat-label">XP / Niveau</div>
+                        </div>
+                        <div class="glass-card stat-card">
+                            <div class="stat-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-value" id="statReferrals">0</div>
+                            <div class="stat-label">Filleuls</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Module IA ORION -->
+                    <div class="orion-module">
+                        <div class="orion-header">
+                            <div class="orion-avatar">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <div>
+                                <h3>IA ORION</h3>
+                                <p style="color: var(--text-secondary); font-size: 0.75rem;">Assistant de Trading Intelligent</p>
+                            </div>
+                        </div>
+                        <div class="orion-bubble" id="orionMessage">
+                            <i class="fas fa-comment"></i> Bonjour Pilote ! Je suis ORION, votre intelligence artificielle de trading. Je suis là pour vous guider dans vos investissements spatiaux. Que souhaitez-vous explorer aujourd'hui ?
+                        </div>
+                        <div style="display: flex; gap: 12px; margin-top: 16px;">
+                            <input type="text" class="input-field" id="orionInput" placeholder="Posez votre question sur l'investissement... (ex: quel est le meilleur investissement ?)">
+                            <button class="btn-primary" id="orionSendBtn">
+                                <i class="fas fa-paper-plane"></i> Envoyer
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Top Planètes -->
+                    <div>
+                        <h3 style="margin-bottom: 16px;"><i class="fas fa-chart-line"></i> Top Planètes du Moment</h3>
+                        <div class="planets-grid" id="topPlanetsContainer">
+                            <!-- Les planètes seront injectées dynamiquement -->
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="input-group">
-                <label class="input-label">Mot de passe</label>
-                <div class="input-wrapper">
-                    <input type="password" class="input-field" id="loginPassword" placeholder="••••••••">
-                    <button class="eye-btn" onclick="togglePassword('loginPassword', this)">👁️</button>
-                </div>
+            
+            <!-- PAGE MARCHÉ DES PLANÈTES -->
+            <div class="page" id="page-market">
+                <h1 style="margin-bottom: 8px;">Marché des Planètes</h1>
+                <p style="color: var(--text-secondary); margin-bottom: 32px;">Investissez dans les planètes les plus prometteuses de la galaxie</p>
+                <div class="planets-grid" id="marketPlanetsContainer"></div>
             </div>
-            <div class="message" id="loginMessage"></div>
-            <button class="btn-primary" onclick="handleLogin()">ENTRER DANS LA GALAXIE</button>
-        </div>
-        
-        <!-- Register Form -->
-        <div class="auth-form" id="registerForm">
-            <div class="input-group">
-                <label class="input-label">E-mail</label>
-                <div class="input-wrapper">
-                    <input type="email" class="input-field" id="regEmail" placeholder="pilote@galaxie.io">
-                </div>
+            
+            <!-- PAGE PORTEFEUILLE -->
+            <div class="page" id="page-portfolio">
+                <h1 style="margin-bottom: 8px;">Mon Portefeuille</h1>
+                <p style="color: var(--text-secondary); margin-bottom: 32px;">Suivez vos investissements et leurs performances</p>
+                <div id="portfolioContainer"></div>
             </div>
-            <div class="input-group">
-                <label class="input-label">Mot de passe</label>
-                <div class="input-wrapper">
-                    <input type="password" class="input-field" id="regPassword" placeholder="8 caractères minimum">
-                    <button class="eye-btn" onclick="togglePassword('regPassword', this)">👁️</button>
-                </div>
+            
+            <!-- PAGE ACADÉMIE -->
+            <div class="page" id="page-academy">
+                <h1 style="margin-bottom: 8px;">Académie Financière</h1>
+                <p style="color: var(--text-secondary); margin-bottom: 32px;">Formez-vous aux meilleures stratégies d'investissement</p>
+                <div id="lessonsContainer"></div>
             </div>
-            <div class="input-group">
-                <label class="input-label">Confirmer</label>
-                <div class="input-wrapper">
-                    <input type="password" class="input-field" id="regConfirm" placeholder="Répétez">
-                </div>
+            
+            <!-- PAGE PARRAINAGE -->
+            <div class="page" id="page-referral">
+                <h1 style="margin-bottom: 8px;">Système de Parrainage</h1>
+                <p style="color: var(--text-secondary); margin-bottom: 32px;">Invitez vos amis et gagnez des bonus</p>
+                <div id="referralContainer"></div>
             </div>
-            <div class="message" id="regMessage"></div>
-            <button class="btn-primary" onclick="handleRegister()">CRÉER MON COMPTE</button>
-        </div>
-        
-        <!-- OTP Panel -->
-        <div class="otp-panel" id="otpPanel">
-            <div class="auth-logo-icon" style="font-size: 2rem;">📡</div>
-            <h3 style="margin: 16px 0 8px;">Vérification requise</h3>
-            <p style="font-size: 0.8rem; color: var(--text-muted);">Code envoyé à <strong id="otpEmail"></strong></p>
-            <div class="otp-boxes" id="otpBoxes">
-                <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
-                <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
-                <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
-                <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
-                <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
-                <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+            
+            <!-- PAGE PROFIL -->
+            <div class="page" id="page-profile">
+                <h1 style="margin-bottom: 8px;">Mon Profil</h1>
+                <p style="color: var(--text-secondary); margin-bottom: 32px;">Gérez vos informations personnelles</p>
+                <div id="profileContainer"></div>
             </div>
-            <div class="message" id="otpMessage"></div>
-            <button class="btn-primary" onclick="verifyOTP()">VALIDER</button>
-            <button class="btn-primary" style="background: transparent; margin-top: 8px;" onclick="resendOTP()">Renvoyer le code</button>
-        </div>
+        </main>
     </div>
-</div>
-
-<!-- DASHBOARD -->
-<div class="dashboard" id="dashboard">
-    <aside class="sidebar">
-        <div class="logo-sidebar">
-            <span class="logo-sidebar-icon">🪐</span>
-            <span class="logo-sidebar-text">GALAXY<br>INVESTOR</span>
-        </div>
-        <nav class="nav-menu">
-            <button class="nav-item active" data-view="market"><span class="nav-icon">📊</span><span>Marché</span></button>
-            <button class="nav-item" data-view="portfolio"><span class="nav-icon">💰</span><span>Portefeuille</span></button>
-            <button class="nav-item" data-view="education"><span class="nav-icon">🎓</span><span>Éducation</span></button>
-            <button class="nav-item" data-view="profile"><span class="nav-icon">👤</span><span>Profil</span></button>
-        </nav>
-        <div class="user-stats-sidebar">
-            <div style="font-size: 0.7rem; color: var(--text-muted);">NIVEAU <span id="sidebarLevel">1</span></div>
-            <div class="xp-bar"><div class="xp-fill" id="sidebarXpFill"></div></div>
-            <div style="font-size: 0.7rem;" id="sidebarRank">Recrue</div>
-        </div>
-    </aside>
     
-    <main class="main-content" id="mainContent">
-        <div id="marketView">
-            <div class="stats-grid">
-                <div class="stat-card"><div class="stat-label">Solde</div><div class="stat-value" id="balanceDisplay">€0</div></div>
-                <div class="stat-card"><div class="stat-label">Portefeuille</div><div class="stat-value" id="portfolioValue">€0</div></div>
-                <div class="stat-card"><div class="stat-label">Profit</div><div class="stat-value" id="profitDisplay">€0</div></div>
-                <div class="stat-card"><div class="stat-label">XP</div><div class="stat-value" id="xpDisplay">0</div></div>
-            </div>
-            <div class="planets-grid" id="planetsGrid"></div>
-        </div>
-        <div id="portfolioView" style="display: none;"><div class="planets-grid" id="portfolioList"></div></div>
-        <div id="educationView" style="display: none;">
-            <h2 style="margin-bottom: 24px;">📚 Formation ORION</h2>
-            <div id="coursesList"></div>
-        </div>
-        <div id="profileView" style="display: none;">
-            <div class="profile-header">
-                <div class="profile-avatar" id="profileAvatar">👨‍🚀</div>
-                <div><h3 id="profileEmail">user@galaxie.io</h3><p id="profileRank">Recrue • Niveau 1</p></div>
-            </div>
-            <button class="btn-primary" onclick="handleLogout()" style="background: var(--red); color: white;">DÉCONNEXION</button>
-        </div>
-    </main>
-    
-    <aside class="ia-panel">
-        <div class="ia-header">
-            <div class="ia-avatar">🧠</div>
-            <div class="ia-title"><h3>ORION AI</h3><p>Assistant financier intelligent</p></div>
-        </div>
-        <div class="ia-messages-container" id="iaMessagesContainer">
-            <div class="ia-message orion"><div class="ia-message-text">✨ Bonjour Pilote ! Je suis ORION, votre IA éducative. Je réagis à vos actions et je peux répondre à vos questions financières.</div></div>
-        </div>
-        <div class="ia-input-area">
-            <input type="text" class="ia-input" id="iaInput" placeholder="Posez une question à ORION...">
-            <button class="ia-send" onclick="sendToOrion()">➤</button>
-        </div>
-    </aside>
-</div>
+    <!-- Notifications Container -->
+    <div class="notification-container" id="notificationContainer"></div>
 
-<div class="bottom-nav">
-    <button class="bottom-nav-item active" data-view="market">📊 Marché</button>
-    <button class="bottom-nav-item" data-view="portfolio">💰 Portefeuille</button>
-    <button class="bottom-nav-item" data-view="education">🎓 Éducation</button>
-    <button class="bottom-nav-item" data-view="profile">👤 Profil</button>
-</div>
-<div class="floating-ia-btn" id="floatingIaBtn">🧠</div>
-<div class="mobile-ia-overlay" id="mobileIaOverlay">
-    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;"><h3 style="color: var(--gold);">ORION AI</h3><button id="closeIaOverlay" style="background: none; border: none; color: white; font-size: 1.5rem;">✕</button></div>
-    <div id="mobileIaMessages" style="flex:1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;"></div>
-    <div style="display: flex; gap: 10px; margin-top: 16px;"><input type="text" id="mobileIaInput" class="ia-input" placeholder="Posez une question..."><button class="ia-send" onclick="sendToOrionMobile()">➤</button></div>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
-// ==================================================
-// SUPABASE CONFIG
-// ==================================================
-const SUPABASE_URL = 'https://fwkisfdoqazapjdnhmwb.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_MSJBTK0-UaBjtoeQTgJ1XQ_pvS3NM_h';
-
-// ==================================================
-// STATE MANAGEMENT
-// ==================================================
-let currentUser = null;
-let currentEmail = '';
-let otpInterval = null;
-
-// Planètes
-const planetsData = [
-    { id: 'luna', name: 'Luna Prime', icon: '🌕', basePrice: 5, volatility: 0.3, roi: 12 },
-    { id: 'mars', name: 'Mars Colony', icon: '🔴', basePrice: 12, volatility: 0.5, roi: 18 },
-    { id: 'saturn', name: 'Saturn Ring', icon: '🪐', basePrice: 25, volatility: 0.4, roi: 22 },
-    { id: 'terra', name: 'Terra Nova', icon: '🌍', basePrice: 8.5, volatility: 0.35, roi: 15 }
-];
-
-let planets = planetsData.map(p => ({ ...p, price: p.basePrice }));
-let portfolio = [];
-let userXP = 0;
-let userBalance = 5.00;
-let activityLog = [];
-let completedCourses = new Set();
-
-// ==================================================
-// THREE.JS 3D BACKGROUND
-// ==================================================
-function init3DBackground() {
-    const container = document.getElementById('canvas3d');
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x030014, 1);
-    container.appendChild(renderer.domElement);
-    
-    // Étoiles
-    const starsGeometry = new THREE.BufferGeometry();
-    const starsCount = 2000;
-    const starsPositions = new Float32Array(starsCount * 3);
-    for (let i = 0; i < starsCount; i++) {
-        starsPositions[i*3] = (Math.random() - 0.5) * 2000;
-        starsPositions[i*3+1] = (Math.random() - 0.5) * 1000;
-        starsPositions[i*3+2] = (Math.random() - 0.5) * 500 - 200;
-    }
-    starsGeometry.setAttribute('position', new THREE.BufferAttribute(starsPositions, 3));
-    const starsMaterial = new THREE.PointsMaterial({ color: 0xffdd99, size: 0.5, transparent: true, opacity: 0.6 });
-    const stars = new THREE.Points(starsGeometry, starsMaterial);
-    scene.add(stars);
-    
-    // Planète centrale
-    const planetGeometry = new THREE.SphereGeometry(2, 64, 64);
-    const planetMaterial = new THREE.MeshStandardMaterial({ color: 0xf5b042, emissive: 0x442200, roughness: 0.3, metalness: 0.7 });
-    const planet = new THREE.Mesh(planetGeometry, planetMaterial);
-    planet.position.set(8, 3, -15);
-    scene.add(planet);
-    
-    // Anneau
-    const ringGeometry = new THREE.TorusGeometry(2.5, 0.2, 64, 200);
-    const ringMaterial = new THREE.MeshStandardMaterial({ color: 0xffaa66, emissive: 0x331100 });
-    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-    ring.rotation.x = Math.PI / 2;
-    ring.rotation.z = Math.PI / 4;
-    planet.add(ring);
-    
-    // Lumière
-    const ambientLight = new THREE.AmbientLight(0x222222);
-    scene.add(ambientLight);
-    const pointLight = new THREE.PointLight(0xffaa66, 1, 50);
-    pointLight.position.set(5, 5, 5);
-    scene.add(pointLight);
-    const backLight = new THREE.PointLight(0x3366ff, 0.5);
-    backLight.position.set(-5, 0, -10);
-    scene.add(backLight);
-    
-    camera.position.z = 20;
-    camera.position.y = 2;
-    
-    let time = 0;
-    function animate() {
-        requestAnimationFrame(animate);
-        time += 0.005;
-        stars.rotation.y = time * 0.05;
-        stars.rotation.x = Math.sin(time * 0.1) * 0.1;
-        planet.rotation.y = time * 0.2;
-        ring.rotation.z += 0.01;
-        camera.position.x = Math.sin(time * 0.1) * 1;
-        camera.lookAt(0, 0, -5);
-        renderer.render(scene, camera);
-    }
-    animate();
-    
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-}
-
-// ==================================================
-// AUTH FUNCTIONS
-// ==================================================
-async function callSupabase(endpoint, body) {
-    const res = await fetch(`${SUPABASE_URL}/auth/v1/${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
-        body: JSON.stringify(body)
-    });
-    return { ok: res.ok, data: await res.json() };
-}
-
-async function handleLogin() {
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    if (!email || !password) { showMessage('loginMessage', '⚠️ Tous les champs sont requis', 'error'); return; }
-    
-    const { ok, data } = await callSupabase('token?grant_type=password', { email, password });
-    if (!ok) { showMessage('loginMessage', data.message || '❌ Erreur', 'error'); return; }
-    
-    currentUser = data.user;
-    localStorage.setItem('gi_token', data.access_token);
-    localStorage.setItem('gi_email', email);
-    showDashboard(email);
-}
-
-async function handleRegister() {
-    const email = document.getElementById('regEmail').value.trim();
-    const password = document.getElementById('regPassword').value;
-    const confirm = document.getElementById('regConfirm').value;
-    if (!email || !password) { showMessage('regMessage', '⚠️ Tous les champs sont requis', 'error'); return; }
-    if (password.length < 8) { showMessage('regMessage', '⚠️ 8 caractères minimum', 'error'); return; }
-    if (password !== confirm) { showMessage('regMessage', '⚠️ Les mots de passe ne correspondent pas', 'error'); return; }
-    
-    const { ok, data } = await callSupabase('signup', { email, password });
-    if (!ok) { showMessage('regMessage', data.message || '❌ Erreur', 'error'); return; }
-    
-    currentEmail = email;
-    showOTPPanel(email);
-}
-
-function showOTPPanel(email) {
-    document.getElementById('otpEmail').innerText = email;
-    document.getElementById('loginForm').classList.remove('active');
-    document.getElementById('registerForm').classList.remove('active');
-    document.getElementById('otpPanel').classList.add('active');
-}
-
-async function verifyOTP() {
-    const boxes = document.querySelectorAll('.otp-box');
-    const token = Array.from(boxes).map(b => b.value).join('');
-    if (token.length !== 6) { showMessage('otpMessage', '⚠️ 6 chiffres requis', 'error'); return; }
-    
-    const { ok, data } = await callSupabase('verify', { type: 'email', email: currentEmail, token });
-    if (!ok) { showMessage('otpMessage', data.message || '❌ Code invalide', 'error'); return; }
-    
-    showMessage('otpMessage', '✅ Compte activé !', 'success');
-    setTimeout(() => showDashboard(currentEmail), 1500);
-}
-
-async function resendOTP() {
-    await callSupabase('resend', { type: 'signup', email: currentEmail });
-    showMessage('otpMessage', '📡 Nouveau code envoyé', 'success');
-}
-
-function showDashboard(email) {
-    document.getElementById('authScene').style.display = 'none';
-    document.getElementById('dashboard').classList.add('active');
-    document.getElementById('profileEmail').innerText = email;
-    loadUserData();
-    renderUI();
-    startMarketSimulation();
-    orionSay(`Bienvenue ${email.split('@')[0]} ! Je suis ORION, votre assistant financier. Commencez par explorer le marché des planètes.`);
-}
-
-function handleLogout() {
-    localStorage.clear();
-    document.getElementById('authScene').style.display = 'flex';
-    document.getElementById('dashboard').classList.remove('active');
-    location.reload();
-}
-
-// ==================================================
-// IA ORION - Interactive
-// ==================================================
-function orionSay(message, isUser = false) {
-    const container = document.getElementById('iaMessagesContainer');
-    const mobileContainer = document.getElementById('mobileIaMessages');
-    const msgDiv = document.createElement('div');
-    msgDiv.className = `ia-message ${isUser ? 'user' : 'orion'}`;
-    msgDiv.innerHTML = `<div class="ia-message-text">${message}</div>`;
-    if (container) container.appendChild(msgDiv);
-    if (mobileContainer) mobileContainer.appendChild(msgDiv);
-    container.scrollTop = container.scrollHeight;
-    if (mobileContainer) mobileContainer.scrollTop = mobileContainer.scrollHeight;
-    
-    // Micro-son
-    try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.frequency.value = isUser ? 440 : 660;
-        gain.gain.value = 0.05;
-        osc.start();
-        gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.2);
-        osc.stop(audioCtx.currentTime + 0.15);
-    } catch(e) {}
-}
-
-function sendToOrion() {
-    const input = document.getElementById('iaInput');
-    const question = input.value.trim();
-    if (!question) return;
-    orionSay(question, true);
-    input.value = '';
-    
-    // Réponses intelligentes
-    setTimeout(() => {
-        const q = question.toLowerCase();
-        if (q.includes('roi') || q.includes('rendement')) {
-            orionSay('📈 Le ROI (Return on Investment) mesure la rentabilité d\'un investissement. Exemple: si vous achetez à 10€ et vendez à 12€, votre ROI est de 20% !');
-        } else if (q.includes('volatilité') || q.includes('risque')) {
-            orionSay('⚠️ La volatilité représente les fluctuations de prix. Une volatilité élevée = risque élevé mais potentiel de gain important. Diversifiez vos investissements !');
-        } else if (q.includes('intérêt') || q.includes('composé')) {
-            orionSay('✨ L\'intérêt composé est la "8ème merveille du monde". Vos gains génèrent des gains supplémentaires. Plus vous investissez tôt, plus l\'effet est puissant !');
-        } else {
-            orionSay('💡 Bonne question ! Je vous conseille de commencer par les planètes à faible volatilité (Luna Prime) pour apprendre. N\'hésitez pas à consulter les quêtes éducatives !');
+    <script>
+        // ========================================================================
+        // PARTIE 1.8: DESIGN 3D AVANCÉ - PLANÈTE CENTRALE AVEC ANNEAUX ROTATIFS
+        // ========================================================================
+        
+        const canvas3d = document.getElementById('canvas-3d');
+        const ctx = canvas3d.getContext('2d');
+        
+        let planetRotation = 0;
+        let stars = [];
+        let particles = [];
+        
+        function resizeCanvas() {
+            canvas3d.width = window.innerWidth;
+            canvas3d.height = window.innerHeight;
+            initStars();
         }
-    }, 300);
-}
-
-function sendToOrionMobile() {
-    const input = document.getElementById('mobileIaInput');
-    const question = input.value.trim();
-    if (!question) return;
-    orionSay(question, true);
-    input.value = '';
-    setTimeout(() => sendToOrion(), 100);
-}
-
-function orionReactToAction(action, details) {
-    const messages = {
-        buy: '🪐 Achat détecté ! Excellent choix. N\'oubliez pas de diversifier votre portefeuille pour réduire les risques.',
-        profit: '📈 Vous réalisez des bénéfices ! Pensez à réinvestir une partie pour profiter de l\'intérêt composé.',
-        levelup: '🎉 Félicitations ! Vous montez en niveau. Les investisseurs expérimentés gèrent mieux leur risque.'
-    };
-    orionSay(messages[action] || `👀 Je vois que vous avez ${action}. Continuez à apprendre !`);
-}
-
-// ==================================================
-// RENDER FUNCTIONS
-// ==================================================
-function renderUI() {
-    document.getElementById('balanceDisplay').innerHTML = `€${userBalance.toFixed(2)}`;
-    const portfolioValue = portfolio.reduce((sum, p) => sum + (planets.find(pl => pl.id === p.id)?.price || p.buyPrice) * p.quantity, 0);
-    document.getElementById('portfolioValue').innerHTML = `€${portfolioValue.toFixed(2)}`;
-    const profit = portfolioValue - portfolio.reduce((sum, p) => sum + p.buyPrice * p.quantity, 0);
-    document.getElementById('profitDisplay').innerHTML = `${profit >= 0 ? '+' : ''}€${profit.toFixed(2)}`;
-    document.getElementById('xpDisplay').innerHTML = userXP;
-    document.getElementById('sidebarLevel').innerHTML = Math.floor(userXP / 100) + 1;
-    document.getElementById('sidebarXpFill').style.width = `${userXP % 100}%`;
-    document.getElementById('sidebarRank').innerHTML = userXP < 100 ? 'Recrue' : userXP < 300 ? 'Navigateur' : userXP < 600 ? 'Explorateur' : 'Commandant';
-    
-    const planetsGrid = document.getElementById('planetsGrid');
-    planetsGrid.innerHTML = planets.map(p => `
-        <div class="planet-card">
-            <div style="display: flex; justify-content: space-between;"><span class="planet-icon" style="font-size: 2rem;">${p.icon}</span><span style="font-size: 1.3rem; color: var(--gold);">${p.price.toFixed(2)}€</span></div>
-            <div style="font-weight: 600; margin: 8px 0;">${p.name}</div>
-            <div style="font-size: 0.7rem; color: var(--green);">ROI +${p.roi}%</div>
-            <button class="buy-btn" onclick="buyPlanet('${p.id}')">Acheter</button>
-        </div>
-    `).join('');
-    
-    const portfolioList = document.getElementById('portfolioList');
-    if (portfolio.length === 0) portfolioList.innerHTML = '<div style="text-align: center; padding: 40px;">Aucun investissement pour le moment</div>';
-    else portfolioList.innerHTML = portfolio.map(item => {
-        const planet = planets.find(p => p.id === item.id);
-        const value = planet.price * item.quantity;
-        const profitPct = ((planet.price - item.buyPrice) / item.buyPrice * 100).toFixed(1);
-        return `<div class="planet-card"><div style="display: flex; justify-content: space-between;"><span style="font-size: 2rem;">${planet.icon}</span><span>${planet.price.toFixed(2)}€</span></div><div><strong>${planet.name}</strong> x${item.quantity}</div><div style="color: ${profitPct >= 0 ? 'var(--green)' : 'var(--red)'};">${profitPct >= 0 ? '+' : ''}${profitPct}%</div></div>`;
-    }).join('');
-    
-    const coursesList = document.getElementById('coursesList');
-    const courses = [
-        { id: 'intro', title: 'Introduction aux investissements', xp: 20, desc: 'Comprendre les bases de l\'investissement' },
-        { id: 'roi', title: 'Le ROI expliqué', xp: 30, desc: 'Comment calculer et interpréter le rendement' },
-        { id: 'risk', title: 'Gestion des risques', xp: 40, desc: 'Diversifier pour sécuriser ses investissements' }
-    ];
-    coursesList.innerHTML = courses.map(c => `
-        <div class="course-card">
-            <h3>📘 ${c.title}</h3>
-            <p style="color: var(--text-muted); font-size: 0.8rem;">${c.desc}</p>
-            <div class="course-progress"><div class="course-progress-fill" style="width: ${completedCourses.has(c.id) ? '100%' : '0%'}"></div></div>
-            ${!completedCourses.has(c.id) ? `<button class="buy-btn" onclick="completeCourse('${c.id}', ${c.xp})">Terminer +${c.xp} XP</button>` : '<span style="color: var(--green);">✅ Complété</span>'}
-        </div>
-    `).join('');
-}
-
-function buyPlanet(planetId) {
-    const planet = planets.find(p => p.id === planetId);
-    if (userBalance < planet.price) {
-        orionSay(`⚠️ Solde insuffisant ! Vous avez ${userBalance.toFixed(2)}€, besoin de ${planet.price.toFixed(2)}€.`);
-        return;
-    }
-    userBalance -= planet.price;
-    const existing = portfolio.find(p => p.id === planetId);
-    if (existing) existing.quantity++;
-    else portfolio.push({ id: planetId, quantity: 1, buyPrice: planet.price });
-    
-    userXP += 10;
-    orionSay(`✨ Achat réussi ! +10 XP. ${planet.name} ajouté à votre portefeuille.`);
-    orionReactToAction('buy', planet.name);
-    renderUI();
-}
-
-function completeCourse(courseId, xp) {
-    if (!completedCourses.has(courseId)) {
-        completedCourses.add(courseId);
-        userXP += xp;
-        orionSay(`🎓 Félicitations ! Cours complété, +${xp} XP. Continuez votre apprentissage !`);
-        renderUI();
-    }
-}
-
-function loadUserData() {
-    const saved = localStorage.getItem('gi_user_data');
-    if (saved) {
-        const data = JSON.parse(saved);
-        userBalance = data.balance || 5;
-        userXP = data.xp || 0;
-        portfolio = data.portfolio || [];
-        completedCourses = new Set(data.completed || []);
-    }
-    setInterval(() => {
-        localStorage.setItem('gi_user_data', JSON.stringify({ balance: userBalance, xp: userXP, portfolio, completed: [...completedCourses] }));
-    }, 5000);
-}
-
-function startMarketSimulation() {
-    setInterval(() => {
-        planets.forEach(p => {
-            const change = (Math.random() - 0.5) * p.volatility * 0.2;
-            p.price = Math.max(p.basePrice * 0.7, Math.min(p.basePrice * 1.5, p.price * (1 + change)));
-            p.price = Math.round(p.price * 100) / 100;
+        
+        function initStars() {
+            stars = [];
+            const starCount = Math.floor((canvas3d.width * canvas3d.height) / 2000);
+            for (let i = 0; i < starCount; i++) {
+                stars.push({
+                    x: Math.random() * canvas3d.width,
+                    y: Math.random() * canvas3d.height,
+                    radius: Math.random() * 2 + 0.5,
+                    alpha: Math.random() * 0.6 + 0.2,
+                    twinkle: Math.random() * Math.PI * 2,
+                    speed: Math.random() * 0.02 + 0.005
+                });
+            }
+        }
+        
+        function drawPlanet3D() {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, canvas3d.width, canvas3d.height);
+            
+            const centerX = canvas3d.width / 2;
+            const centerY = canvas3d.height / 2;
+            const radius = Math.min(canvas3d.width, canvas3d.height) * 0.16;
+            
+            // Dessiner les anneaux
+            for (let i = 0; i < 3; i++) {
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(planetRotation);
+                
+                const ringRadius = radius + 18 + (i * 12);
+                const ringWidth = 6 + i * 2;
+                
+                ctx.beginPath();
+                ctx.ellipse(0, 0, ringRadius, ringRadius * 0.4, 0, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(245, 176, 66, ${0.35 - i * 0.08})`;
+                ctx.lineWidth = ringWidth;
+                ctx.stroke();
+                
+                // Effet de brillance sur l'anneau
+                ctx.beginPath();
+                ctx.ellipse(0, 0, ringRadius + 2, ringRadius * 0.42, 0, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(255, 217, 102, ${0.15 - i * 0.05})`;
+                ctx.lineWidth = ringWidth - 2;
+                ctx.stroke();
+                
+                ctx.restore();
+            }
+            
+            // Planète centrale avec dégradé 3D
+            const gradient = ctx.createRadialGradient(centerX - 15, centerY - 15, 5, centerX, centerY, radius);
+            gradient.addColorStop(0, '#f5b042');
+            gradient.addColorStop(0.4, '#e09d32');
+            gradient.addColorStop(0.7, '#b87c1a');
+            gradient.addColorStop(1, '#6a4a00');
+            
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            // Ombrage pour effet 3D
+            ctx.beginPath();
+            ctx.arc(centerX - 8, centerY - 8, radius * 0.3, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.fill();
+            
+            // Reflet de lumière
+            ctx.beginPath();
+            ctx.arc(centerX - 12, centerY - 12, radius * 0.15, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.fill();
+            
+            // Glow effect
+            ctx.shadowBlur = 40;
+            ctx.shadowColor = '#f5b042';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius + 5, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(245, 176, 66, 0.1)';
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            
+            // Dessiner les étoiles
+            for (let star of stars) {
+                const twinkle = Math.sin(Date.now() * star.speed + star.twinkle) * 0.3 + 0.5;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 235, 185, ${star.alpha * twinkle})`;
+                ctx.fill();
+            }
+            
+            // Particules flottantes autour de la planète
+            for (let i = 0; i < 30; i++) {
+                const angle = Date.now() * 0.002 + i;
+                const dist = radius + 25 + Math.sin(angle * 2) * 8;
+                const x = centerX + Math.cos(angle) * dist;
+                const y = centerY + Math.sin(angle) * dist * 0.6;
+                ctx.beginPath();
+                ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(245, 176, 66, ${0.3 + Math.sin(angle * 3) * 0.2})`;
+                ctx.fill();
+            }
+            
+            planetRotation += 0.008;
+            requestAnimationFrame(drawPlanet3D);
+        }
+        
+        // Créer des particules flottantes
+        function createFloatingParticles() {
+            const container = document.getElementById('floatingParticles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                const size = Math.random() * 4 + 1;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 20 + 's';
+                particle.style.animationDuration = 15 + Math.random() * 20 + 's';
+                container.appendChild(particle);
+            }
+        }
+        
+        // Créer le champ d'étoiles fixes
+        function createStarsField() {
+            const container = document.getElementById('starsField');
+            for (let i = 0; i < 200; i++) {
+                const star = document.createElement('div');
+                star.style.position = 'absolute';
+                star.style.width = Math.random() * 2 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.backgroundColor = 'white';
+                star.style.borderRadius = '50%';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.opacity = Math.random() * 0.6 + 0.2;
+                star.style.animation = `twinkle ${Math.random() * 3 + 2}s ease-in-out infinite`;
+                container.appendChild(star);
+            }
+        }
+        
+        // Animation de scintillement
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes twinkle {
+                0%, 100% { opacity: 0.2; transform: scale(1); }
+                50% { opacity: 0.8; transform: scale(1.2); }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // ========================================================================
+        // PARTIE 1.9: APPSTATE & UTILITAIRES INITIAUX
+        // ========================================================================
+        
+        const AppState = {
+            user: null,
+            session: null,
+            balance: 1000.00,
+            profit: 0.00,
+            xp: 0,
+            rank: 'RECRUE',
+            referrals: 0,
+            referralCode: null,
+            portfolio: [],
+            marketPlanets: [
+                { id: 1, name: '🌕 Luna Prime', price: 5.00, roi: 12, img: '🌕', description: 'La lune, investissement stable et sûr', owned: false, quantity: 0, totalInvest: 0 },
+                { id: 2, name: '🔴 Mars Colony', price: 12.00, roi: 8.5, img: '🔴', description: 'La planète rouge en plein essor', owned: false, quantity: 0, totalInvest: 0 },
+                { id: 3, name: '🪐 Saturn Ring', price: 25.00, roi: 15, img: '🪐', description: 'Les anneaux de Saturne, ROI exceptionnel', owned: false, quantity: 0, totalInvest: 0 },
+                { id: 4, name: '🌍 Terra Nova', price: 8.50, roi: 6, img: '🌍', description: 'Nouvelle Terre, investissement écologique', owned: false, quantity: 0, totalInvest: 0 },
+                { id: 5, name: '💎 Diamondia', price: 45.00, roi: 22, img: '💎', description: 'Planète de diamants, haut risque haut rendement', owned: false, quantity: 0, totalInvest: 0 },
+                { id: 6, name: '⚡ Voltar', price: 18.00, roi: 10.5, img: '⚡', description: 'Énergie pure, rendement stable', owned: false, quantity: 0, totalInvest: 0 }
+            ],
+            lessons: [
+                { id: 1, title: 'Introduction à l\'investissement', content: 'Découvrez les bases de l\'investissement spatial, comment fonctionnent les marchés et les opportunités qui s\'offrent à vous.', xpReward: 50, moneyReward: 10, completed: false, quiz: { question: 'Qu\'est-ce que le ROI ?', options: ['Retour sur investissement', 'Risque opérationnel', 'Rendement obligataire'], correct: 0 } },
+                { id: 2, title: 'Gestion du risque', content: 'Apprenez à diversifier votre portefeuille et à protéger vos investissements contre la volatilité.', xpReward: 75, moneyReward: 15, completed: false, quiz: { question: 'Comment réduire le risque ?', options: ['Tout investir sur une planète', 'Diversifier son portefeuille', 'Attendre la baisse'], correct: 1 } },
+                { id: 3, title: 'Intérêts composés', content: 'La magie des intérêts composés expliquée. Pourquoi investir tôt est crucial.', xpReward: 100, moneyReward: 20, completed: false, quiz: { question: 'Les intérêts composés permettent...', options: ['Gagner moins', 'Gagner plus avec le temps', 'Perdre de l\'argent'], correct: 1 } },
+                { id: 4, title: 'Analyse technique', content: 'Les bases de l\'analyse technique pour anticiper les mouvements du marché.', xpReward: 125, moneyReward: 25, completed: false, quiz: { question: 'Qu\'est-ce qu\'une tendance haussière ?', options: ['Prix qui monte', 'Prix qui descend', 'Marché stable'], correct: 0 } }
+            ]
+        };
+        
+        // Fonctions utilitaires
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notificationContainer');
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : (type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle');
+            notification.innerHTML = `
+                <i class="fas ${icon}"></i>
+                <span>${message}</span>
+            `;
+            container.appendChild(notification);
+            
+            setTimeout(() => notification.classList.add('show'), 10);
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        function vibrate(duration = 50) {
+            if (window.navigator && window.navigator.vibrate) {
+                window.navigator.vibrate(duration);
+            }
+        }
+        
+        function playClickSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.frequency.value = 880;
+                gainNode.gain.value = 0.08;
+                oscillator.start();
+                gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.15);
+                oscillator.stop(audioCtx.currentTime + 0.15);
+            } catch(e) {}
+        }
+        
+        function updateUI() {
+            document.getElementById('userBalanceDisplay').innerHTML = `<i class="fas fa-coins"></i><span>${AppState.balance.toFixed(2)} €</span>`;
+            document.getElementById('statBalance').innerHTML = `${AppState.balance.toFixed(2)} €`;
+            document.getElementById('statProfit').innerHTML = `${AppState.profit.toFixed(2)} €`;
+            document.getElementById('statXP').innerHTML = AppState.xp;
+            document.getElementById('statReferrals').innerHTML = AppState.referrals;
+            document.getElementById('userRankDisplay').innerHTML = `<i class="fas fa-star"></i><span>${AppState.rank}</span>`;
+        }
+        
+        function updateRank() {
+            if (AppState.xp >= 5000) AppState.rank = 'EMPEREUR';
+            else if (AppState.xp >= 2000) AppState.rank = 'COMMANDANT';
+            else if (AppState.xp >= 500) AppState.rank = 'PILOTE';
+            else AppState.rank = 'RECRUE';
+            updateUI();
+        }
+        
+        function addXP(amount) {
+            AppState.xp += amount;
+            updateRank();
+            showNotification(`+${amount} XP !`, 'success');
+            vibrate(50);
+        }
+        
+        function addMoney(amount) {
+            AppState.balance += amount;
+            updateUI();
+            showNotification(`+${amount.toFixed(2)} € ajoutés !`, 'success');
+        }
+        
+        // ========================================================================
+        // PARTIE 1.10: INITIALISATION & ÉVÉNEMENTS DE BASE
+        // ========================================================================
+        
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                item.classList.add('active');
+                const page = item.dataset.page;
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                document.getElementById(`page-${page}`).classList.add('active');
+                vibrate(30);
+                playClickSound();
+                
+                // Rendre les contenus dynamiques
+                if (page === 'market') renderMarket();
+                if (page === 'portfolio') renderPortfolio();
+                if (page === 'academy') renderAcademy();
+                if (page === 'referral') renderReferral();
+                if (page === 'profile') renderProfile();
+            });
         });
-        renderUI();
-        orionSay(`📊 Mise à jour du marché : les prix ont fluctué. Vérifiez votre portefeuille !`);
-    }, 30000);
-}
-
-function togglePassword(id, btn) {
-    const input = document.getElementById(id);
-    if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
-    else { input.type = 'password'; btn.textContent = '👁️'; }
-}
-
-function showMessage(id, text, type) {
-    const el = document.getElementById(id);
-    el.className = `message ${type}`;
-    el.textContent = text;
-    setTimeout(() => { if (el) el.className = 'message'; }, 3000);
-}
-
-// Navigation
-function initNavigation() {
-    const views = { market: document.getElementById('marketView'), portfolio: document.getElementById('portfolioView'), education: document.getElementById('educationView'), profile: document.getElementById('profileView') };
-    document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const view = btn.dataset.view;
-            Object.keys(views).forEach(v => { if (views[v]) views[v].style.display = v === view ? 'block' : 'none'; });
-            document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+        
+        // Menu toggle
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('mainContent').classList.toggle('sidebar-open');
+            vibrate(20);
         });
-    });
-}
-
-// OTP Boxes navigation
-document.querySelectorAll('.otp-box').forEach((box, idx, arr) => {
-    box.addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, ''); if (e.target.value && idx < 5) arr[idx + 1].focus(); });
-    box.addEventListener('keydown', e => { if (e.key === 'Backspace' && !box.value && idx > 0) arr[idx - 1].focus(); });
-});
-
-// Auth tabs
-document.querySelectorAll('.auth-tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-        const target = tab.dataset.tab;
-        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        document.getElementById('loginForm').classList.toggle('active', target === 'login');
-        document.getElementById('registerForm').classList.toggle('active', target === 'register');
-        document.getElementById('otpPanel').classList.remove('active');
-    });
-});
-
-// Mobile IA
-document.getElementById('floatingIaBtn')?.addEventListener('click', () => document.getElementById('mobileIaOverlay').classList.add('active'));
-document.getElementById('closeIaOverlay')?.addEventListener('click', () => document.getElementById('mobileIaOverlay').classList.remove('active'));
-document.getElementById('mobileIaInput')?.addEventListener('keypress', e => { if (e.key === 'Enter') sendToOrionMobile(); });
-
-// Enter keys
-document.getElementById('loginPassword')?.addEventListener('keypress', e => { if (e.key === 'Enter') handleLogin(); });
-document.getElementById('regConfirm')?.addEventListener('keypress', e => { if (e.key === 'Enter') handleRegister(); });
-document.getElementById('iaInput')?.addEventListener('keypress', e => { if (e.key === 'Enter') sendToOrion(); });
-
-// Init
-init3DBackground();
-initNavigation();
-
-// Check session
-const token = localStorage.getItem('gi_token');
-const email = localStorage.getItem('gi_email');
-if (token && email) showDashboard(email);
-</script>
+        
+        // IA Orion
+        document.getElementById('orionSendBtn').addEventListener('click', () => {
+            const input = document.getElementById('orionInput');
+            const question = input.value.trim();
+            if (!question) return;
+            
+            const orionMessage = document.getElementById('orionMessage');
+            const responses = {
+                'investir': 'Commandant, je vous conseille de diversifier votre portefeuille. Luna Prime offre une stabilité à 12% de ROI, tandis que Saturn Ring propose 15% avec un risque modéré.',
+                'risque': 'La gestion du risque est primordiale. Règle d\'or : ne jamais investir plus de 20% de votre capital sur une seule planète. Diversifiez !',
+                'roi': 'Le ROI moyen du marché galactique est de 12%. Saturn Ring est actuellement le plus performant avec 15%, suivi de Diamondia à 22% mais avec un risque plus élevé.',
+                'meilleur': 'D\'après mes analyses, Saturn Ring offre le meilleur équilibre risque/rendement avec 15% de ROI. Diamondia est plus risqué mais peut rapporter gros.',
+                'parrainage': 'Chaque filleul vous rapporte 5% de ses investissements. Partagez votre code unique et augmentez vos revenus passifs !',
+                'xp': 'Gagnez de l\'XP en complétant les leçons de l\'Académie et en réalisant des investissements. Plus votre rang augmente, plus vous débloquez d\'avantages !'
+            };
+            
+            let reply = "Je suis ORION, votre IA de trading. Je peux vous conseiller sur les investissements, la gestion du risque, le ROI, le parrainage et l'XP. Que souhaitez-vous savoir ?";
+            
+            for (let key in responses) {
+                if (question.toLowerCase().includes(key)) {
+                    reply = responses[key];
+                    break;
+                }
+            }
+            
+            orionMessage.innerHTML = `<i class="fas fa-comment"></i> ${reply}`;
+            input.value = '';
+            vibrate(30);
+            playClickSound();
+        });
+        
+        // Fonctions de rendu (seront complétées dans les parties suivantes)
+        function renderMarket() {
+            const container = document.getElementById('marketPlanetsContainer');
+            if (!container) return;
+            container.innerHTML = AppState.marketPlanets.map(planet => `
+                <div class="glass-card planet-card" onclick="buyPlanet(${planet.id})">
+                    <div class="planet-emoji">${planet.img}</div>
+                    <div class="planet-name">${planet.name}</div>
+                    <div class="planet-price">💰 ${planet.price.toFixed(2)} €</div>
+                    <div class="planet-roi">📈 ROI: +${planet.roi}%</div>
+                    <p style="color: var(--text-muted); font-size: 0.7rem; text-align: center; margin-top: 8px;">${planet.description}</p>
+                    <button class="btn-primary" style="width: 100%; margin-top: 12px; padding: 10px;">Investir</button>
+                </div>
+            `).join('');
+        }
+        
+        function renderPortfolio() {
+            const container = document.getElementById('portfolioContainer');
+            if (!container) return;
+            if (AppState.portfolio.length === 0) {
+                container.innerHTML = '<div class="glass-card" style="padding: 48px; text-align: center;"><i class="fas fa-chart-line" style="font-size: 3rem; color: var(--text-muted);"></i><p style="margin-top: 16px;">Aucun investissement pour le moment. Explorez le marché des planètes !</p></div>';
+                return;
+            }
+            container.innerHTML = AppState.portfolio.map(p => {
+                const currentValue = p.price * p.quantity;
+                const profit = currentValue - p.totalInvest;
+                return `
+                    <div class="glass-card" style="padding: 20px; margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+                            <div><span style="font-size: 2rem;">${p.img}</span> <strong style="font-size: 1.1rem;">${p.name}</strong></div>
+                            <div>Quantité: ${p.quantity}</div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 16px;">
+                            <div><span style="color: var(--text-muted);">Investi:</span><br><strong>${p.totalInvest.toFixed(2)} €</strong></div>
+                            <div><span style="color: var(--text-muted);">Valeur actuelle:</span><br><strong>${currentValue.toFixed(2)} €</strong></div>
+                            <div><span style="color: var(--text-muted);">Profit:</span><br><strong style="color: ${profit >= 0 ? 'var(--success)' : 'var(--error)'};">${profit >= 0 ? '+' : ''}${profit.toFixed(2)} €</strong></div>
+                        </div>
+                        <div class="strength-bar-container" style="margin-top: 12px;"><div class="strength-bar" style="width: ${Math.min(100, (currentValue / (p.totalInvest || 1)) * 100)}%; background: ${profit >= 0 ? 'var(--success)' : 'var(--error)'};"></div></div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function renderAcademy() {
+            const container = document.getElementById('lessonsContainer');
+            if (!container) return;
+            container.innerHTML = AppState.lessons.map(lesson => `
+                <div class="glass-card" style="padding: 24px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; flex-wrap: wrap;">
+                        <div>
+                            <h3 style="margin-bottom: 8px;">📚 ${lesson.title}</h3>
+                            <p style="color: var(--text-secondary); line-height: 1.5;">${lesson.content}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="background: rgba(245,176,66,0.1); padding: 8px 12px; border-radius: 12px; margin-bottom: 8px;">
+                                <i class="fas fa-star"></i> +${lesson.xpReward} XP
+                            </div>
+                            <div style="background: rgba(16,185,129,0.1); padding: 8px 12px; border-radius: 12px;">
+                                <i class="fas fa-coins"></i> +${lesson.moneyReward} €
+                            </div>
+                        </div>
+                    </div>
+                    ${!lesson.completed ? `<button class="btn-primary" style="margin-top: 16px;" onclick="startQuiz(${lesson.id - 1})"><i class="fas fa-question-circle"></i> Faire le quiz</button>` : '<div style="margin-top: 16px; color: var(--success);"><i class="fas fa-check-circle"></i> Leçon complétée !</div>'}
+                </div>
+            `).join('');
+        }
+        
+        function renderReferral() {
+            if (!AppState.referralCode) AppState.referralCode = 'GAL-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            const container = document.getElementById('referralContainer');
+            if (!container) return;
+            container.innerHTML = `
+                <div class="glass-card" style="padding: 32px; text-align: center;">
+                    <i class="fas fa-gift" style="font-size: 4rem; color: var(--gold-primary);"></i>
+                    <h3 style="margin: 24px 0 12px;">Votre code de parrainage unique</h3>
+                    <div style="background: rgba(245,176,66,0.1); padding: 16px; border-radius: 16px; font-family: monospace; font-size: 1.3rem; letter-spacing: 2px; margin: 16px 0;">${AppState.referralCode}</div>
+                    <button class="btn-primary" onclick="copyReferralCode()"><i class="fas fa-copy"></i> Copier le code</button>
+                    <div style="margin-top: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="glass-card" style="padding: 20px;"><i class="fas fa-users" style="font-size: 2rem;"></i><h4 style="margin: 8px 0;">Filleuls</h4><div style="font-size: 2rem; font-family: 'Orbitron';">${AppState.referrals}</div></div>
+                        <div class="glass-card" style="padding: 20px;"><i class="fas fa-coins" style="font-size: 2rem;"></i><h4 style="margin: 8px 0;">Bonus total</h4><div style="font-size: 2rem; font-family: 'Orbitron';">${(AppState.referrals * 5).toFixed(2)} €</div></div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderProfile() {
+            const container = document.getElementById('profileContainer');
+            if (!container) return;
+            container.innerHTML = `
+                <div class="glass-card" style="padding: 32px;">
+                    <div style="text-align: center;">
+                        <i class="fas fa-user-astronaut" style="font-size: 5rem; color: var(--gold-primary);"></i>
+                        <h2 style="margin: 16px 0;">${localStorage.getItem('gi_email') || 'Pilote Spatial'}</h2>
+                        <div class="user-rank" style="display: inline-flex; padding: 8px 24px;">${AppState.rank}</div>
+                    </div>
+                    <div style="margin-top: 32px;">
+                        <h3>Statistiques du Pilote</h3>
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 16px;">
+                            <div class="glass-card" style="padding: 16px;"><i class="fas fa-coins"></i> Solde: <strong>${AppState.balance.toFixed(2)} €</strong></div>
+                            <div class="glass-card" style="padding: 16px;"><i class="fas fa-chart-line"></i> Profits: <strong>${AppState.profit.toFixed(2)} €</strong></div>
+                            <div class="glass-card" style="padding: 16px;"><i class="fas fa-star"></i> XP: <strong>${AppState.xp}</strong></div>
+                            <div class="glass-card" style="padding: 16px;"><i class="fas fa-users"></i> Filleuls: <strong>${AppState.referrals}</strong></div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 24px;">
+                        <h3>Progression</h3>
+                        <div class="strength-bar-container" style="margin-top: 12px;"><div class="strength-bar" style="width: ${Math.min(100, (AppState.xp / 5000) * 100)}%; background: var(--gold-primary);"></div></div>
+                        <p style="color: var(--text-muted); margin-top: 8px;">${AppState.xp} / 5000 XP vers le rang EMPEREUR</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function buyPlanet(id) {
+            const planet = AppState.marketPlanets.find(p => p.id === id);
+            if (!planet) return;
+            if (AppState.balance < planet.price) {
+                showNotification('Solde insuffisant ! Gagnez plus en complétant les leçons.', 'error');
+                vibrate(100);
+                return;
+            }
+            AppState.balance -= planet.price;
+            const owned = AppState.portfolio.find(p => p.id === id);
+            if (owned) {
+                owned.quantity++;
+                owned.totalInvest += planet.price;
+            } else {
+                AppState.portfolio.push({ ...planet, quantity: 1, totalInvest: planet.price, owned: true });
+            }
+            updateUI();
+            renderMarket();
+            renderPortfolio();
+            showNotification(`Achat réussi ! Vous possédez maintenant ${planet.name}`, 'success');
+            playClickSound();
+            addXP(10);
+        }
+        
+        function startQuiz(lessonIdx) {
+            const lesson = AppState.lessons[lessonIdx];
+            const modal = document.createElement('div');
+            modal.style.cssText = 'position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 1000; display: flex; align-items: center; justify-content: center;';
+            modal.innerHTML = `
+                <div class="glass-card" style="max-width: 500px; width: 90%; padding: 32px;">
+                    <h3 style="margin-bottom: 16px;">Quiz: ${lesson.title}</h3>
+                    <p style="margin-bottom: 20px;"><strong>${lesson.quiz.question}</strong></p>
+                    <div id="quizOptions"></div>
+                    <button class="btn-secondary" style="margin-top: 20px;" onclick="this.closest('div').remove()">Fermer</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            const optionsDiv = modal.querySelector('#quizOptions');
+            lesson.quiz.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.textContent = opt;
+                btn.className = 'btn-secondary';
+                btn.style.cssText = 'display: block; width: 100%; margin: 8px 0; text-align: left;';
+                btn.onclick = () => {
+                    if (idx === lesson.quiz.correct) {
+                        lesson.completed = true;
+                        addXP(lesson.xpReward);
+                        addMoney(lesson.moneyReward);
+                        showNotification('Quiz réussi ! +' + lesson.xpReward + ' XP et +' + lesson.moneyReward + ' €', 'success');
+                        renderAcademy();
+                        modal.remove();
+                    } else {
+                        showNotification('Mauvaise réponse. Réessayez !', 'error');
+                        vibrate(100);
+                    }
+                };
+                optionsDiv.appendChild(btn);
+            });
+        }
+        
+        function copyReferralCode() {
+            navigator.clipboard.writeText(AppState.referralCode);
+            showNotification('Code copié ! Partagez-le avec vos amis.', 'success');
+        }
+        
+        // Exposer les fonctions globalement
+        window.buyPlanet = buyPlanet;
+        window.startQuiz = startQuiz;
+        window.copyReferralCode = copyReferralCode;
+        
+        // Initialisation
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            initStars();
+            createStarsField();
+            createFloatingParticles();
+            drawPlanet3D();
+            renderMarket();
+            renderPortfolio();
+            renderAcademy();
+            renderReferral();
+            renderProfile();
+            updateUI();
+            console.log('🚀 Galaxy Investor Pro - Partie 1 chargée avec succès !');
+        });
+        
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Gestion des messages pour la console
+        console.log('%c✨ GALAXY INVESTOR PRO ✨', 'color: #f5b042; font-size: 16px; font-weight: bold;');
+        console.log('%cPlateforme de Trading Spatial - Version Premium', 'color: #cbd5e1; font-size: 12px;');
+        console.log('%cDesign 3D | Glassmorphism 2.0 | IA Orion | Prêt pour la Partie 2', 'color: #10b981; font-size: 12px;');
+    </script>
 </body>
 </html>

@@ -3,19 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-<meta name="theme-color" content="#02040a">
+<meta name="theme-color" content="#030014">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>ORION | Galaxy Investor — Plateforme d'Investissement Spatial</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<title>ORION AI | Galaxy Investor — Plateforme d'Investissement Spatial V10</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Space+Grotesk:wght@400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 /* ==================================================
    VARIABLES & RESET
 ================================================== */
 :root {
-    --bg-primary: #02040a;
-    --bg-secondary: #0a0e1a;
-    --bg-glass: rgba(10, 14, 26, 0.75);
-    --bg-glass-solid: rgba(10, 14, 26, 0.95);
+    --bg-primary: #030014;
+    --bg-secondary: #0a0a1a;
+    --bg-glass: rgba(10, 14, 26, 0.65);
+    --bg-glass-solid: rgba(5, 8, 22, 0.95);
     --gold: #f5b042;
     --gold-dim: rgba(245, 176, 66, 0.15);
     --gold-glow: rgba(245, 176, 66, 0.4);
@@ -25,15 +25,13 @@
     --green: #20d07a;
     --green-dim: rgba(32, 208, 122, 0.15);
     --red: #f04e6a;
-    --red-dim: rgba(240, 78, 106, 0.15);
     --blue: #3a86ff;
-    --blue-dim: rgba(58, 134, 255, 0.15);
     --purple: #9b4dff;
     --border: 1px solid rgba(245, 176, 66, 0.1);
-    --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-    --radius: 20px;
-    --radius-sm: 12px;
-    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    --radius: 24px;
+    --radius-sm: 14px;
+    --transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
 }
 
 * {
@@ -51,26 +49,262 @@ body {
     height: 100vh;
 }
 
-/* Canvas étoiles */
-#starCanvas {
+/* Canvas Three.js */
+#canvas3d {
     position: fixed;
     inset: 0;
-    pointer-events: none;
+    width: 100%;
+    height: 100%;
     z-index: 0;
 }
 
+/* Overlay gradient */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 50% 30%, rgba(3, 0, 20, 0.3) 0%, rgba(3, 0, 20, 0.85) 100%);
+    pointer-events: none;
+    z-index: 1;
+}
+
 /* ==================================================
-   LAYOUT PRINCIPAL
+   AUTH SCENE
 ================================================== */
-.app {
-    position: relative;
-    z-index: 10;
+.auth-scene {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
     display: flex;
-    height: 100vh;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    transition: opacity 0.5s ease, visibility 0.5s;
+}
+
+.auth-card {
+    max-width: 480px;
+    width: 100%;
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    border: var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    box-shadow: var(--shadow);
+    animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-logo {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.auth-logo-icon {
+    font-size: 3.5rem;
+    filter: drop-shadow(0 0 20px var(--gold-glow));
+    animation: float 4s ease-in-out infinite;
+}
+
+.auth-logo-text {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    background: linear-gradient(135deg, var(--gold), #ffdd99);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-top: 8px;
+}
+
+.auth-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 60px;
+    padding: 4px;
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 12px;
+    background: transparent;
+    border: none;
+    border-radius: 60px;
+    color: var(--text-muted);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.auth-tab.active {
+    background: var(--gold-dim);
+    color: var(--gold);
+}
+
+.auth-form {
+    display: none;
+}
+
+.auth-form.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-field {
+    width: 100%;
+    padding: 14px 48px 14px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(245, 176, 66, 0.2);
+    border-radius: 16px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    outline: none;
+    transition: var(--transition);
+}
+
+.input-field:focus {
+    border-color: var(--gold);
+    background: rgba(245, 176, 66, 0.05);
+    box-shadow: 0 0 0 3px rgba(245, 176, 66, 0.1);
+}
+
+.eye-btn {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--gold), #ffdd99);
+    border: none;
+    border-radius: 40px;
+    color: var(--bg-primary);
+    font-weight: 700;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-top: 8px;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(245, 176, 66, 0.3);
+}
+
+.message {
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    margin-top: 12px;
+    display: none;
+}
+
+.message.error {
+    background: var(--red-dim);
+    border: 1px solid rgba(240, 78, 106, 0.3);
+    color: var(--red);
+    display: block;
+}
+
+.message.success {
+    background: var(--green-dim);
+    border: 1px solid rgba(32, 208, 122, 0.3);
+    color: var(--green);
+    display: block;
+}
+
+/* OTP Panel */
+.otp-panel {
+    display: none;
+    text-align: center;
+}
+
+.otp-panel.active {
+    display: block;
+}
+
+.otp-boxes {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin: 24px 0;
+}
+
+.otp-box {
+    width: 52px;
+    height: 60px;
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    font-family: 'Orbitron', monospace;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(245, 176, 66, 0.3);
+    border-radius: 16px;
+    color: var(--gold);
+    outline: none;
+}
+
+.otp-box:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(245, 176, 66, 0.2);
+}
+
+/* ==================================================
+   DASHBOARD
+================================================== */
+.dashboard {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: none;
     overflow: hidden;
 }
 
-/* SIDEBAR GAUCHE (Desktop) */
+.dashboard.active {
+    display: flex;
+}
+
+/* Sidebar */
 .sidebar {
     width: 280px;
     background: var(--bg-glass);
@@ -78,32 +312,28 @@ body {
     border-right: var(--border);
     display: flex;
     flex-direction: column;
-    padding: 24px 20px;
-    transition: var(--transition);
-    z-index: 20;
+    padding: 28px 20px;
+    z-index: 60;
 }
 
-.logo-area {
+.logo-sidebar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     margin-bottom: 40px;
-    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: var(--border);
 }
 
-.logo-icon {
-    font-size: 2.5rem;
-    filter: drop-shadow(0 0 15px var(--gold-glow));
-    animation: float 4s ease-in-out infinite;
+.logo-sidebar-icon {
+    font-size: 2rem;
 }
 
-.logo-text {
-    font-family: 'Space Grotesk', monospace;
-    font-weight: 700;
-    font-size: 1.2rem;
+.logo-sidebar-text {
+    font-family: 'Orbitron', monospace;
+    font-weight: 800;
+    font-size: 0.9rem;
     letter-spacing: 0.1em;
-    background: linear-gradient(135deg, var(--gold), #ffdd99);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    margin-top: 8px;
 }
 
 .nav-menu {
@@ -120,46 +350,32 @@ body {
     padding: 12px 16px;
     background: transparent;
     border: none;
-    border-radius: var(--radius-sm);
+    border-radius: 14px;
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
     transition: var(--transition);
-    width: 100%;
     text-align: left;
 }
 
-.nav-item:hover {
+.nav-item:hover, .nav-item.active {
     background: var(--gold-dim);
     color: var(--gold);
     transform: translateX(4px);
 }
 
-.nav-item.active {
-    background: linear-gradient(90deg, var(--gold-dim), transparent);
-    border-left: 2px solid var(--gold);
-    color: var(--gold);
-}
-
 .nav-icon {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
 }
 
-.user-info {
+.user-stats-sidebar {
     margin-top: auto;
     padding-top: 20px;
     border-top: var(--border);
 }
 
-.user-rank {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-}
-
-.user-xp-bar {
+.xp-bar {
     height: 4px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 4px;
@@ -167,59 +383,54 @@ body {
     overflow: hidden;
 }
 
-.user-xp-fill {
+.xp-fill {
     height: 100%;
+    background: linear-gradient(90deg, var(--gold), #ffdd99);
     width: 0%;
-    background: linear-gradient(90deg, var(--gold), var(--gold-glow));
-    border-radius: 4px;
     transition: width 0.5s ease;
 }
 
-/* MAIN CONTENT */
+/* Main Content */
 .main-content {
     flex: 1;
     overflow-y: auto;
-    padding: 24px 32px;
-    scroll-behavior: smooth;
+    padding: 28px 32px;
 }
 
-/* PANEL IA DROIT (Desktop) */
+/* IA Panel */
 .ia-panel {
-    width: 340px;
+    width: 380px;
     background: var(--bg-glass);
     backdrop-filter: blur(20px);
     border-left: var(--border);
     display: flex;
     flex-direction: column;
-    padding: 24px 20px;
-    transition: var(--transition);
-    z-index: 20;
+    z-index: 60;
 }
 
 .ia-header {
+    padding: 24px 20px;
+    border-bottom: var(--border);
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: var(--border);
 }
 
 .ia-avatar {
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     background: linear-gradient(135deg, var(--gold), #ffdd99);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.8rem;
-    animation: pulse-glow 2s ease infinite;
+    animation: pulseGlow 2s ease infinite;
 }
 
-.ia-title h4 {
+.ia-title h3 {
+    font-family: 'Orbitron', monospace;
     font-size: 1rem;
-    font-weight: 700;
     color: var(--gold);
 }
 
@@ -228,25 +439,31 @@ body {
     color: var(--text-muted);
 }
 
-.ia-messages {
+.ia-messages-container {
     flex: 1;
     overflow-y: auto;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    margin-bottom: 20px;
 }
 
 .ia-message {
-    padding: 12px 14px;
+    padding: 12px 16px;
     background: rgba(255, 255, 255, 0.03);
-    border-radius: var(--radius-sm);
-    border-left: 2px solid var(--gold);
+    border-radius: 18px;
+    border-left: 3px solid var(--gold);
     animation: slideIn 0.3s ease;
 }
 
 .ia-message.orion {
     border-left-color: var(--purple);
+}
+
+.ia-message.user {
+    background: var(--gold-dim);
+    border-left-color: var(--gold);
+    align-self: flex-end;
 }
 
 .ia-message-text {
@@ -255,70 +472,36 @@ body {
     color: var(--text-secondary);
 }
 
-.ia-message-time {
-    font-size: 0.6rem;
-    color: var(--text-muted);
-    margin-top: 6px;
-    display: block;
-}
-
-.quests-list {
-    margin-top: 20px;
-    padding-top: 16px;
+.ia-input-area {
+    padding: 16px 20px;
     border-top: var(--border);
-}
-
-.quest-title {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--gold);
-    margin-bottom: 12px;
-    text-transform: uppercase;
-}
-
-.quest-item {
     display: flex;
-    align-items: center;
     gap: 10px;
-    padding: 10px 0;
-    font-size: 0.75rem;
-    color: var(--text-secondary);
+}
+
+.ia-input {
+    flex: 1;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: var(--border);
+    border-radius: 40px;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    outline: none;
+}
+
+.ia-send {
+    width: 44px;
+    height: 44px;
+    background: var(--gold-dim);
+    border: none;
+    border-radius: 50%;
+    color: var(--gold);
     cursor: pointer;
     transition: var(--transition);
 }
 
-.quest-item:hover {
-    color: var(--gold);
-    transform: translateX(4px);
-}
-
-.quest-badge {
-    width: 24px;
-    height: 24px;
-    background: var(--gold-dim);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-}
-
-/* ==================================================
-   MARKET & PORTFOLIO CARDS
-================================================== */
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.section-title {
-    font-size: 1.3rem;
-    font-weight: 700;
-    font-family: 'Space Grotesk', monospace;
-}
-
+/* Stats Grid */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -330,8 +513,8 @@ body {
     background: var(--bg-glass);
     backdrop-filter: blur(10px);
     border: var(--border);
-    border-radius: var(--radius);
-    padding: 18px 16px;
+    border-radius: 20px;
+    padding: 20px;
     transition: var(--transition);
 }
 
@@ -350,24 +533,12 @@ body {
 .stat-value {
     font-size: 1.6rem;
     font-weight: 700;
-    font-family: 'Space Grotesk', monospace;
+    font-family: 'Orbitron', monospace;
     color: var(--gold);
     margin-top: 8px;
 }
 
-.stat-change {
-    font-size: 0.7rem;
-    margin-top: 6px;
-}
-
-.positive {
-    color: var(--green);
-}
-
-.negative {
-    color: var(--red);
-}
-
+/* Planets Grid */
 .planets-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -379,7 +550,7 @@ body {
     background: var(--bg-glass);
     backdrop-filter: blur(10px);
     border: var(--border);
-    border-radius: var(--radius);
+    border-radius: 20px;
     padding: 20px;
     transition: var(--transition);
     cursor: pointer;
@@ -388,64 +559,68 @@ body {
 .planet-card:hover {
     border-color: var(--gold);
     transform: translateY(-4px);
-    box-shadow: var(--shadow);
-}
-
-.planet-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-}
-
-.planet-icon {
-    font-size: 2rem;
-}
-
-.planet-price {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--gold);
-}
-
-.planet-name {
-    font-size: 1rem;
-    font-weight: 600;
-    margin-bottom: 4px;
-}
-
-.planet-roi {
-    font-size: 0.75rem;
-    color: var(--green);
-}
-
-.planet-volatility {
-    font-size: 0.7rem;
-    color: var(--text-muted);
-    margin: 12px 0;
 }
 
 .buy-btn {
     width: 100%;
     padding: 10px;
-    background: linear-gradient(135deg, var(--gold-dim), transparent);
-    border: 1px solid var(--gold-dim);
+    background: var(--gold-dim);
+    border: none;
     border-radius: 40px;
     color: var(--gold);
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition);
+    margin-top: 12px;
 }
 
-.buy-btn:hover {
-    background: var(--gold);
-    color: var(--bg-primary);
-    transform: scale(1.02);
+/* Education Section */
+.course-card {
+    background: var(--bg-glass);
+    border: var(--border);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
 }
 
-/* ==================================================
-   MOBILE BOTTOM NAV
-================================================== */
+.course-progress {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    margin: 12px 0;
+    overflow: hidden;
+}
+
+.course-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), #ffdd99);
+    width: 0%;
+    border-radius: 3px;
+}
+
+/* Profile Section */
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 32px;
+    padding: 24px;
+    background: var(--bg-glass);
+    border-radius: 28px;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--gold), #ffdd99);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+}
+
+/* Mobile Bottom Nav */
 .bottom-nav {
     display: none;
     position: fixed;
@@ -455,9 +630,9 @@ body {
     background: var(--bg-glass-solid);
     backdrop-filter: blur(20px);
     border-top: var(--border);
-    padding: 12px 20px 24px;
+    padding: 10px 20px 24px;
     justify-content: space-around;
-    z-index: 30;
+    z-index: 70;
 }
 
 .bottom-nav-item {
@@ -468,11 +643,10 @@ body {
     background: none;
     border: none;
     color: var(--text-muted);
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     cursor: pointer;
     padding: 6px 12px;
     border-radius: 40px;
-    transition: var(--transition);
 }
 
 .bottom-nav-item.active {
@@ -493,829 +667,627 @@ body {
     justify-content: center;
     font-size: 1.6rem;
     cursor: pointer;
+    z-index: 70;
     box-shadow: 0 4px 20px rgba(245, 176, 66, 0.4);
-    z-index: 40;
-    transition: var(--transition);
 }
 
 .mobile-ia-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.9);
-    z-index: 100;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 200;
     flex-direction: column;
     padding: 20px;
 }
 
-.mobile-ia-overlay.active {
-    display: flex;
-}
-
-/* ==================================================
-   ANIMATIONS
-================================================== */
 @keyframes float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-5px); }
 }
 
-@keyframes pulse-glow {
+@keyframes pulseGlow {
     0%, 100% { box-shadow: 0 0 5px var(--gold); }
     50% { box-shadow: 0 0 20px var(--gold); }
 }
 
 @keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
-/* ==================================================
-   RESPONSIVE
-================================================== */
+/* Responsive */
 @media (max-width: 1024px) {
-    .sidebar {
-        width: 80px;
-        padding: 24px 12px;
-    }
-    
-    .logo-text, .nav-item span:last-child, .user-info {
-        display: none;
-    }
-    
-    .nav-item {
-        justify-content: center;
-        padding: 12px;
-    }
-    
-    .nav-icon {
-        font-size: 1.5rem;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+    .sidebar { width: 80px; padding: 20px 12px; }
+    .logo-sidebar-text, .nav-item span:last-child, .user-stats-sidebar { display: none; }
+    .nav-item { justify-content: center; padding: 12px; }
+    .nav-icon { font-size: 1.4rem; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .ia-panel { width: 320px; }
 }
 
 @media (max-width: 768px) {
-    .sidebar {
-        display: none;
-    }
-    
-    .ia-panel {
-        display: none;
-    }
-    
-    .bottom-nav {
-        display: flex;
-    }
-    
-    .floating-ia-btn {
-        display: flex;
-    }
-    
-    .main-content {
-        padding: 20px 16px 100px;
-    }
-    
-    .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-    
-    .section-title {
-        font-size: 1.1rem;
-    }
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-    width: 4px;
-}
-
-::-webkit-scrollbar-track {
-    background: var(--bg-secondary);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--gold-dim);
-    border-radius: 4px;
+    .sidebar, .ia-panel { display: none; }
+    .bottom-nav, .floating-ia-btn { display: flex; }
+    .main-content { padding: 20px 16px 100px; }
+    .stats-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
 <body>
 
-<canvas id="starCanvas"></canvas>
+<div id="canvas3d"></div>
+<div class="overlay"></div>
 
-<div class="app" id="app">
-    <!-- SIDEBAR GAUCHE -->
-    <aside class="sidebar" id="sidebar">
-        <div class="logo-area">
-            <div class="logo-icon">🪐</div>
-            <div class="logo-text">GALAXY<br>INVESTOR</div>
+<!-- AUTH SCENE -->
+<div class="auth-scene" id="authScene">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <div class="auth-logo-icon">🪐</div>
+            <div class="auth-logo-text">GALAXY INVESTOR</div>
+            <div style="font-size: 0.65rem; color: var(--text-muted); margin-top: 8px;">Powered by ORION AI</div>
         </div>
         
-        <nav class="nav-menu">
-            <button class="nav-item active" data-view="market">
-                <span class="nav-icon">📊</span>
-                <span>Marché</span>
-            </button>
-            <button class="nav-item" data-view="portfolio">
-                <span class="nav-icon">💰</span>
-                <span>Portefeuille</span>
-            </button>
-            <button class="nav-item" data-view="education">
-                <span class="nav-icon">🎓</span>
-                <span>Éducation</span>
-            </button>
-            <button class="nav-item" data-view="activity">
-                <span class="nav-icon">📜</span>
-                <span>Activité</span>
-            </button>
-        </nav>
+        <div class="auth-tabs">
+            <button class="auth-tab active" data-tab="login">Connexion</button>
+            <button class="auth-tab" data-tab="register">Inscription</button>
+        </div>
         
-        <div class="user-info">
-            <div class="user-rank" id="userRank">Recrue</div>
-            <div class="user-xp-bar">
-                <div class="user-xp-fill" id="xpFill" style="width: 0%"></div>
+        <!-- Login Form -->
+        <div class="auth-form active" id="loginForm">
+            <div class="input-group">
+                <label class="input-label">E-mail</label>
+                <div class="input-wrapper">
+                    <input type="email" class="input-field" id="loginEmail" placeholder="pilote@galaxie.io">
+                </div>
             </div>
-            <div style="font-size: 0.7rem;" id="userXpText">0 / 100 XP</div>
+            <div class="input-group">
+                <label class="input-label">Mot de passe</label>
+                <div class="input-wrapper">
+                    <input type="password" class="input-field" id="loginPassword" placeholder="••••••••">
+                    <button class="eye-btn" onclick="togglePassword('loginPassword', this)">👁️</button>
+                </div>
+            </div>
+            <div class="message" id="loginMessage"></div>
+            <button class="btn-primary" onclick="handleLogin()">ENTRER DANS LA GALAXIE</button>
+        </div>
+        
+        <!-- Register Form -->
+        <div class="auth-form" id="registerForm">
+            <div class="input-group">
+                <label class="input-label">E-mail</label>
+                <div class="input-wrapper">
+                    <input type="email" class="input-field" id="regEmail" placeholder="pilote@galaxie.io">
+                </div>
+            </div>
+            <div class="input-group">
+                <label class="input-label">Mot de passe</label>
+                <div class="input-wrapper">
+                    <input type="password" class="input-field" id="regPassword" placeholder="8 caractères minimum">
+                    <button class="eye-btn" onclick="togglePassword('regPassword', this)">👁️</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <label class="input-label">Confirmer</label>
+                <div class="input-wrapper">
+                    <input type="password" class="input-field" id="regConfirm" placeholder="Répétez">
+                </div>
+            </div>
+            <div class="message" id="regMessage"></div>
+            <button class="btn-primary" onclick="handleRegister()">CRÉER MON COMPTE</button>
+        </div>
+        
+        <!-- OTP Panel -->
+        <div class="otp-panel" id="otpPanel">
+            <div class="auth-logo-icon" style="font-size: 2rem;">📡</div>
+            <h3 style="margin: 16px 0 8px;">Vérification requise</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">Code envoyé à <strong id="otpEmail"></strong></p>
+            <div class="otp-boxes" id="otpBoxes">
+                <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+                <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+                <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+                <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+                <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+                <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+            </div>
+            <div class="message" id="otpMessage"></div>
+            <button class="btn-primary" onclick="verifyOTP()">VALIDER</button>
+            <button class="btn-primary" style="background: transparent; margin-top: 8px;" onclick="resendOTP()">Renvoyer le code</button>
+        </div>
+    </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+    <aside class="sidebar">
+        <div class="logo-sidebar">
+            <span class="logo-sidebar-icon">🪐</span>
+            <span class="logo-sidebar-text">GALAXY<br>INVESTOR</span>
+        </div>
+        <nav class="nav-menu">
+            <button class="nav-item active" data-view="market"><span class="nav-icon">📊</span><span>Marché</span></button>
+            <button class="nav-item" data-view="portfolio"><span class="nav-icon">💰</span><span>Portefeuille</span></button>
+            <button class="nav-item" data-view="education"><span class="nav-icon">🎓</span><span>Éducation</span></button>
+            <button class="nav-item" data-view="profile"><span class="nav-icon">👤</span><span>Profil</span></button>
+        </nav>
+        <div class="user-stats-sidebar">
+            <div style="font-size: 0.7rem; color: var(--text-muted);">NIVEAU <span id="sidebarLevel">1</span></div>
+            <div class="xp-bar"><div class="xp-fill" id="sidebarXpFill"></div></div>
+            <div style="font-size: 0.7rem;" id="sidebarRank">Recrue</div>
         </div>
     </aside>
     
-    <!-- MAIN CONTENT -->
     <main class="main-content" id="mainContent">
-        <!-- Market View -->
         <div id="marketView">
-            <div class="section-header">
-                <h2 class="section-title">🌌 Marché des Planètes</h2>
-                <span style="font-size: 0.7rem; color: var(--text-muted);">Prix actualisés en temps réel</span>
-            </div>
-            
             <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Solde Total</div>
-                    <div class="stat-value" id="balanceDisplay">€0</div>
-                    <div class="stat-change positive" id="balanceChange">+€5 bonus</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Valeur Portefeuille</div>
-                    <div class="stat-value" id="portfolioValue">€0</div>
-                    <div class="stat-change" id="portfolioChange">+0%</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Profit Total</div>
-                    <div class="stat-value" id="profitDisplay">€0</div>
-                    <div class="stat-change positive" id="profitChange">+0%</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">XP / Niveau</div>
-                    <div class="stat-value" id="xpDisplay">0</div>
-                    <div class="stat-change">Niveau 1</div>
-                </div>
+                <div class="stat-card"><div class="stat-label">Solde</div><div class="stat-value" id="balanceDisplay">€0</div></div>
+                <div class="stat-card"><div class="stat-label">Portefeuille</div><div class="stat-value" id="portfolioValue">€0</div></div>
+                <div class="stat-card"><div class="stat-label">Profit</div><div class="stat-value" id="profitDisplay">€0</div></div>
+                <div class="stat-card"><div class="stat-label">XP</div><div class="stat-value" id="xpDisplay">0</div></div>
             </div>
-            
             <div class="planets-grid" id="planetsGrid"></div>
         </div>
-        
-        <!-- Portfolio View (caché par défaut) -->
-        <div id="portfolioView" style="display: none;">
-            <div class="section-header">
-                <h2 class="section-title">📦 Mon Portefeuille</h2>
-            </div>
-            <div id="portfolioList" class="planets-grid"></div>
-        </div>
-        
-        <!-- Education View -->
+        <div id="portfolioView" style="display: none;"><div class="planets-grid" id="portfolioList"></div></div>
         <div id="educationView" style="display: none;">
-            <div class="section-header">
-                <h2 class="section-title">🎓 Quêtes Éducatives</h2>
-            </div>
-            <div class="planets-grid" id="questsGrid"></div>
+            <h2 style="margin-bottom: 24px;">📚 Formation ORION</h2>
+            <div id="coursesList"></div>
         </div>
-        
-        <!-- Activity View -->
-        <div id="activityView" style="display: none;">
-            <div class="section-header">
-                <h2 class="section-title">📜 Journal d'Activité</h2>
+        <div id="profileView" style="display: none;">
+            <div class="profile-header">
+                <div class="profile-avatar" id="profileAvatar">👨‍🚀</div>
+                <div><h3 id="profileEmail">user@galaxie.io</h3><p id="profileRank">Recrue • Niveau 1</p></div>
             </div>
-            <div id="activityLog" style="display: flex; flex-direction: column; gap: 12px;"></div>
+            <button class="btn-primary" onclick="handleLogout()" style="background: var(--red); color: white;">DÉCONNEXION</button>
         </div>
     </main>
     
-    <!-- PANEL IA ORION (Droit) -->
-    <aside class="ia-panel" id="iaPanel">
+    <aside class="ia-panel">
         <div class="ia-header">
             <div class="ia-avatar">🧠</div>
-            <div class="ia-title">
-                <h4>ORION AI</h4>
-                <p>Assistant financier & coach</p>
-            </div>
+            <div class="ia-title"><h3>ORION AI</h3><p>Assistant financier intelligent</p></div>
         </div>
-        
-        <div class="ia-messages" id="iaMessages">
-            <div class="ia-message">
-                <div class="ia-message-text">✨ Bienvenue Pilote ! Je suis ORION, votre assistant financier. J'observe vos décisions pour vous aider à mieux investir.</div>
-                <span class="ia-message-time">Maintenant</span>
-            </div>
+        <div class="ia-messages-container" id="iaMessagesContainer">
+            <div class="ia-message orion"><div class="ia-message-text">✨ Bonjour Pilote ! Je suis ORION, votre IA éducative. Je réagis à vos actions et je peux répondre à vos questions financières.</div></div>
         </div>
-        
-        <div class="quests-list">
-            <div class="quest-title">🎯 Quêtes disponibles</div>
-            <div id="questsList"></div>
+        <div class="ia-input-area">
+            <input type="text" class="ia-input" id="iaInput" placeholder="Posez une question à ORION...">
+            <button class="ia-send" onclick="sendToOrion()">➤</button>
         </div>
     </aside>
 </div>
 
-<!-- MOBILE COMPONENTS -->
-<div class="bottom-nav" id="bottomNav">
+<div class="bottom-nav">
     <button class="bottom-nav-item active" data-view="market">📊 Marché</button>
     <button class="bottom-nav-item" data-view="portfolio">💰 Portefeuille</button>
     <button class="bottom-nav-item" data-view="education">🎓 Éducation</button>
-    <button class="bottom-nav-item" data-view="activity">📜 Activité</button>
+    <button class="bottom-nav-item" data-view="profile">👤 Profil</button>
 </div>
-
 <div class="floating-ia-btn" id="floatingIaBtn">🧠</div>
-
 <div class="mobile-ia-overlay" id="mobileIaOverlay">
-    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-        <h3 style="color: var(--gold);">ORION AI</h3>
-        <button id="closeIaOverlay" style="background: none; border: none; color: white; font-size: 1.5rem;">✕</button>
-    </div>
-    <div id="mobileIaMessages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;"></div>
+    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;"><h3 style="color: var(--gold);">ORION AI</h3><button id="closeIaOverlay" style="background: none; border: none; color: white; font-size: 1.5rem;">✕</button></div>
+    <div id="mobileIaMessages" style="flex:1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px;"></div>
+    <div style="display: flex; gap: 10px; margin-top: 16px;"><input type="text" id="mobileIaInput" class="ia-input" placeholder="Posez une question..."><button class="ia-send" onclick="sendToOrionMobile()">➤</button></div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 // ==================================================
-// STATE MANAGEMENT GLOBAL
+// SUPABASE CONFIG
 // ==================================================
-const AppState = {
-    user: {
-        email: 'pilote@galaxie.io',
-        balance: 5.00,
-        xp: 0,
-        level: 1,
-        rank: 'Recrue'
-    },
-    portfolio: [], // { id, name, icon, quantity, buyPrice }
-    planets: [],
-    activityLog: [],
-    completedQuests: new Set(),
-    
-    listeners: [],
-    
-    subscribe(listener) {
-        this.listeners.push(listener);
-        return () => {
-            this.listeners = this.listeners.filter(l => l !== listener);
-        };
-    },
-    
-    notify() {
-        this.listeners.forEach(l => l(this));
-        this.saveToLocalStorage();
-    },
-    
-    addActivity(action, details) {
-        const entry = {
-            id: Date.now(),
-            action,
-            details,
-            time: new Date().toLocaleTimeString(),
-            timestamp: Date.now()
-        };
-        this.activityLog.unshift(entry);
-        if (this.activityLog.length > 50) this.activityLog.pop();
-        this.notify();
-        
-        // LogSnag tracking
-        this.logToLogSnag(action, details);
-    },
-    
-    async logToLogSnag(event, description) {
-        try {
-            await fetch('https://api.logsnag.com/v1/log', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer e6fa992cf0de8f0df0daade72d70954f'
-                },
-                body: JSON.stringify({
-                    project: 'galaxy-investor',
-                    channel: 'activite',
-                    event: event,
-                    description: description,
-                    icon: '🚀',
-                    notify: false
-                })
-            });
-        } catch(e) { console.log('LogSnag offline'); }
-    },
-    
-    saveToLocalStorage() {
-        localStorage.setItem('gi_portfolio', JSON.stringify(this.portfolio));
-        localStorage.setItem('gi_balance', this.user.balance);
-        localStorage.setItem('gi_xp', this.user.xp);
-        localStorage.setItem('gi_completed', JSON.stringify([...this.completedQuests]));
-    },
-    
-    loadFromLocalStorage() {
-        const savedPortfolio = localStorage.getItem('gi_portfolio');
-        const savedBalance = localStorage.getItem('gi_balance');
-        const savedXp = localStorage.getItem('gi_xp');
-        const savedCompleted = localStorage.getItem('gi_completed');
-        
-        if (savedPortfolio) this.portfolio = JSON.parse(savedPortfolio);
-        if (savedBalance) this.user.balance = parseFloat(savedBalance);
-        if (savedXp) this.user.xp = parseInt(savedXp);
-        if (savedCompleted) this.completedQuests = new Set(JSON.parse(savedCompleted));
-        
-        this.updateUserStats();
-        this.notify();
-    },
-    
-    updateUserStats() {
-        this.user.level = Math.floor(this.user.xp / 100) + 1;
-        const ranks = ['Recrue', 'Navigateur', 'Explorateur', 'Commandant', 'Magnat'];
-        this.user.rank = ranks[Math.min(Math.floor(this.user.xp / 200), 4)] || 'Légende';
-        
-        const totalValue = this.getPortfolioValue();
-        if (totalValue > 100) this.addXp(5, 'Atteindre 100€ de portefeuille');
-    },
-    
-    addXp(amount, reason) {
-        this.user.xp += amount;
-        this.updateUserStats();
-        this.addActivity('🎓 +' + amount + ' XP', reason);
-        this.orionAdvise('🎉 ' + reason + ' ! +' + amount + ' XP');
-        this.notify();
-    },
-    
-    getPortfolioValue() {
-        return this.portfolio.reduce((total, item) => {
-            const planet = this.planets.find(p => p.id === item.id);
-            return total + (planet ? planet.price * item.quantity : 0);
-        }, 0);
-    },
-    
-    buyPlanet(planetId, quantity = 1) {
-        const planet = this.planets.find(p => p.id === planetId);
-        if (!planet) return false;
-        
-        const cost = planet.price * quantity;
-        if (this.user.balance < cost) {
-            this.orionAdvise(`⚠️ Solde insuffisant pour acheter ${planet.name}. Votre solde est de ${this.user.balance.toFixed(2)}€`);
-            return false;
-        }
-        
-        this.user.balance -= cost;
-        
-        const existing = this.portfolio.find(p => p.id === planetId);
-        if (existing) {
-            existing.quantity += quantity;
-            existing.buyPrice = (existing.buyPrice * (existing.quantity - quantity) + planet.price * quantity) / existing.quantity;
-        } else {
-            this.portfolio.push({
-                id: planetId,
-                name: planet.name,
-                icon: planet.icon,
-                quantity: quantity,
-                buyPrice: planet.price
-            });
-        }
-        
-        this.addActivity('🪐 ACHAT', `${quantity}x ${planet.name} pour ${cost.toFixed(2)}€`);
-        this.orionAnalyzePurchase(planet);
-        
-        // Effet visuel: accélération étoiles
-        this.triggerStarBurst();
-        this.vibrate(50);
-        
-        this.notify();
-        return true;
-    },
-    
-    orionAnalyzePurchase(planet) {
-        const roi = ((planet.price - planet.basePrice) / planet.basePrice * 100).toFixed(1);
-        let message = `📈 Achat de ${planet.name} à ${planet.price.toFixed(2)}€. `;
-        
-        if (planet.volatility > 0.7) {
-            message += `⚠️ Attention, c'est un actif à haute volatilité (${(planet.volatility*100).toFixed(0)}%). Le ROI potentiel est élevé mais risqué.`;
-        } else if (planet.roi > 10) {
-            message += `✨ Excellent choix ! Cet actif a un ROI estimé à +${planet.roi}%.`;
-        } else {
-            message += `💡 Actif stable avec ${planet.roi}% de ROI estimé. Parfait pour diversifier.`;
-        }
-        
-        this.addIaMessage(message);
-        
-        // Quête éducative: premier achat
-        if (this.portfolio.length === 1 && !this.completedQuests.has('first_buy')) {
-            this.completedQuests.add('first_buy');
-            this.addXp(20, 'Premier achat réussi !');
-            this.addIaMessage('🏆 Félicitations pour votre premier achat ! +20 XP. Continuez à explorer le marché.');
-        }
-    },
-    
-    orionAdvise(message) {
-        this.addIaMessage(`💡 Conseil ORION: ${message}`);
-        
-        // Coaching financier: analyse du cash non investi
-        const totalValue = this.getPortfolioValue();
-        const cashRatio = this.user.balance / (this.user.balance + totalValue);
-        
-        if (cashRatio > 0.7 && totalValue > 0) {
-            this.addIaMessage(`📊 Analyse: ${(cashRatio*100).toFixed(0)}% de votre capital est en cash. Pensez à diversifier vos investissements pour optimiser vos rendements.`);
-        } else if (cashRatio > 0.9 && totalValue === 0) {
-            this.addIaMessage(`🚀 Vous n'avez pas encore investi ! Commencez par acheter une planète pour générer des rendements.`);
-        }
-        
-        if (totalValue > 100 && !this.completedQuests.has('portfolio_100')) {
-            this.completedQuests.add('portfolio_100');
-            this.addXp(30, 'Portefeuille atteint 100€ !');
-            this.addIaMessage('🎉 Objectif atteint ! Votre portefeuille dépasse 100€. +30 XP');
-        }
-    },
-    
-    addIaMessage(text) {
-        const message = {
-            id: Date.now(),
-            text,
-            time: new Date().toLocaleTimeString(),
-            isOrion: true
-        };
-        
-        // Stocker dans un tableau pour l'historique IA
-        if (!this.iaMessages) this.iaMessages = [];
-        this.iaMessages.unshift(message);
-        if (this.iaMessages.length > 30) this.iaMessages.pop();
-        
-        this.updateIaPanel();
-        this.playSoftBeep();
-    },
-    
-    updateIaPanel() {
-        const container = document.getElementById('iaMessages');
-        const mobileContainer = document.getElementById('mobileIaMessages');
-        
-        if (!this.iaMessages) this.iaMessages = [];
-        
-        const renderMessages = (msgs) => {
-            return msgs.slice(0, 20).map(m => `
-                <div class="ia-message">
-                    <div class="ia-message-text">${m.text}</div>
-                    <span class="ia-message-time">${m.time}</span>
-                </div>
-            `).join('');
-        };
-        
-        if (container) container.innerHTML = renderMessages(this.iaMessages);
-        if (mobileContainer) mobileContainer.innerHTML = renderMessages(this.iaMessages);
-    },
-    
-    triggerStarBurst() {
-        // Animation canvas: accélération temporaire
-        if (window.starSpeedMultiplier) {
-            window.starSpeedMultiplier = 3;
-            setTimeout(() => { window.starSpeedMultiplier = 1; }, 500);
-        }
-    },
-    
-    vibrate(duration = 30) {
-        if (window.navigator && window.navigator.vibrate) {
-            window.navigator.vibrate(duration);
-        }
-    },
-    
-    playSoftBeep() {
-        try {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.frequency.value = 660;
-            gain.gain.value = 0.08;
-            osc.start();
-            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.2);
-            osc.stop(audioCtx.currentTime + 0.15);
-        } catch(e) {}
-    }
-};
+const SUPABASE_URL = 'https://fwkisfdoqazapjdnhmwb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_MSJBTK0-UaBjtoeQTgJ1XQ_pvS3NM_h';
 
 // ==================================================
-// DONNÉES DES PLANÈTES
+// STATE MANAGEMENT
 // ==================================================
-const PLANETS_DATA = [
-    { id: 'luna', name: 'Luna Prime', icon: '🌕', basePrice: 5.00, volatility: 0.3, roi: 12, description: 'Satellite stable, rendement modéré' },
-    { id: 'mars', name: 'Mars Colony', icon: '🔴', basePrice: 12.00, volatility: 0.5, roi: 18, description: 'Colonie en expansion, croissance rapide' },
-    { id: 'saturn', name: 'Saturn Ring', icon: '🪐', basePrice: 25.00, volatility: 0.4, roi: 22, description: 'Anneaux d\'investissement premium' },
-    { id: 'terra', name: 'Terra Nova', icon: '🌍', basePrice: 8.50, volatility: 0.35, roi: 15, description: 'Terre nouvelle, équilibre parfait' },
-    { id: 'jupiter', name: 'Jupiter Prime', icon: '🪐', basePrice: 45.00, volatility: 0.65, roi: 35, description: 'Géante gazeuse, haut risque haut rendement' },
-    { id: 'pluto', name: 'Pluto Edge', icon: '⛰️', basePrice: 3.20, volatility: 0.25, roi: 8, description: 'Planète naine, entrée de gamme' }
+let currentUser = null;
+let currentEmail = '';
+let otpInterval = null;
+
+// Planètes
+const planetsData = [
+    { id: 'luna', name: 'Luna Prime', icon: '🌕', basePrice: 5, volatility: 0.3, roi: 12 },
+    { id: 'mars', name: 'Mars Colony', icon: '🔴', basePrice: 12, volatility: 0.5, roi: 18 },
+    { id: 'saturn', name: 'Saturn Ring', icon: '🪐', basePrice: 25, volatility: 0.4, roi: 22 },
+    { id: 'terra', name: 'Terra Nova', icon: '🌍', basePrice: 8.5, volatility: 0.35, roi: 15 }
 ];
 
-// Initialiser les planètes avec prix fluctuants
-function initPlanets() {
-    return PLANETS_DATA.map(p => ({
-        ...p,
-        price: p.basePrice,
-        priceHistory: [p.basePrice],
-        updatePrice() {
-            const variation = (Math.random() - 0.5) * this.volatility * 1.5;
-            let newPrice = this.price * (1 + variation);
-            newPrice = Math.max(this.basePrice * 0.7, Math.min(this.basePrice * 1.8, newPrice));
-            this.price = parseFloat(newPrice.toFixed(2));
-            this.priceHistory.push(this.price);
-            if (this.priceHistory.length > 20) this.priceHistory.shift();
-            return this.price;
-        }
-    }));
+let planets = planetsData.map(p => ({ ...p, price: p.basePrice }));
+let portfolio = [];
+let userXP = 0;
+let userBalance = 5.00;
+let activityLog = [];
+let completedCourses = new Set();
+
+// ==================================================
+// THREE.JS 3D BACKGROUND
+// ==================================================
+function init3DBackground() {
+    const container = document.getElementById('canvas3d');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x030014, 1);
+    container.appendChild(renderer.domElement);
+    
+    // Étoiles
+    const starsGeometry = new THREE.BufferGeometry();
+    const starsCount = 2000;
+    const starsPositions = new Float32Array(starsCount * 3);
+    for (let i = 0; i < starsCount; i++) {
+        starsPositions[i*3] = (Math.random() - 0.5) * 2000;
+        starsPositions[i*3+1] = (Math.random() - 0.5) * 1000;
+        starsPositions[i*3+2] = (Math.random() - 0.5) * 500 - 200;
+    }
+    starsGeometry.setAttribute('position', new THREE.BufferAttribute(starsPositions, 3));
+    const starsMaterial = new THREE.PointsMaterial({ color: 0xffdd99, size: 0.5, transparent: true, opacity: 0.6 });
+    const stars = new THREE.Points(starsGeometry, starsMaterial);
+    scene.add(stars);
+    
+    // Planète centrale
+    const planetGeometry = new THREE.SphereGeometry(2, 64, 64);
+    const planetMaterial = new THREE.MeshStandardMaterial({ color: 0xf5b042, emissive: 0x442200, roughness: 0.3, metalness: 0.7 });
+    const planet = new THREE.Mesh(planetGeometry, planetMaterial);
+    planet.position.set(8, 3, -15);
+    scene.add(planet);
+    
+    // Anneau
+    const ringGeometry = new THREE.TorusGeometry(2.5, 0.2, 64, 200);
+    const ringMaterial = new THREE.MeshStandardMaterial({ color: 0xffaa66, emissive: 0x331100 });
+    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+    ring.rotation.x = Math.PI / 2;
+    ring.rotation.z = Math.PI / 4;
+    planet.add(ring);
+    
+    // Lumière
+    const ambientLight = new THREE.AmbientLight(0x222222);
+    scene.add(ambientLight);
+    const pointLight = new THREE.PointLight(0xffaa66, 1, 50);
+    pointLight.position.set(5, 5, 5);
+    scene.add(pointLight);
+    const backLight = new THREE.PointLight(0x3366ff, 0.5);
+    backLight.position.set(-5, 0, -10);
+    scene.add(backLight);
+    
+    camera.position.z = 20;
+    camera.position.y = 2;
+    
+    let time = 0;
+    function animate() {
+        requestAnimationFrame(animate);
+        time += 0.005;
+        stars.rotation.y = time * 0.05;
+        stars.rotation.x = Math.sin(time * 0.1) * 0.1;
+        planet.rotation.y = time * 0.2;
+        ring.rotation.z += 0.01;
+        camera.position.x = Math.sin(time * 0.1) * 1;
+        camera.lookAt(0, 0, -5);
+        renderer.render(scene, camera);
+    }
+    animate();
+    
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
 }
 
 // ==================================================
-// RENDU UI
+// AUTH FUNCTIONS
 // ==================================================
-function renderUI(state) {
-    // Stats
-    document.getElementById('balanceDisplay').innerHTML = `€${state.user.balance.toFixed(2)}`;
-    document.getElementById('portfolioValue').innerHTML = `€${state.getPortfolioValue().toFixed(2)}`;
-    const totalValue = state.getPortfolioValue();
-    const profit = totalValue - state.portfolio.reduce((sum, p) => sum + (p.buyPrice * p.quantity), 0);
-    document.getElementById('profitDisplay').innerHTML = `€${profit.toFixed(2)}`;
-    document.getElementById('xpDisplay').innerHTML = state.user.xp;
-    document.getElementById('xpFill').style.width = `${(state.user.xp % 100)}%`;
-    document.getElementById('userXpText').innerHTML = `${state.user.xp % 100} / 100 XP`;
-    document.getElementById('userRank').innerHTML = state.user.rank;
+async function callSupabase(endpoint, body) {
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY },
+        body: JSON.stringify(body)
+    });
+    return { ok: res.ok, data: await res.json() };
+}
+
+async function handleLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    if (!email || !password) { showMessage('loginMessage', '⚠️ Tous les champs sont requis', 'error'); return; }
     
-    // Marché
-    const planetsGrid = document.getElementById('planetsGrid');
-    if (planetsGrid) {
-        planetsGrid.innerHTML = state.planets.map(planet => `
-            <div class="planet-card" data-planet-id="${planet.id}">
-                <div class="planet-header">
-                    <span class="planet-icon">${planet.icon}</span>
-                    <span class="planet-price">${planet.price.toFixed(2)} €</span>
-                </div>
-                <div class="planet-name">${planet.name}</div>
-                <div class="planet-roi">ROI estimé: +${planet.roi}%</div>
-                <div class="planet-volatility">Volatilité: ${(planet.volatility*100).toFixed(0)}%</div>
-                <button class="buy-btn" onclick="AppState.buyPlanet('${planet.id}', 1)">Acheter</button>
-            </div>
-        `).join('');
-    }
+    const { ok, data } = await callSupabase('token?grant_type=password', { email, password });
+    if (!ok) { showMessage('loginMessage', data.message || '❌ Erreur', 'error'); return; }
     
-    // Portefeuille
-    const portfolioList = document.getElementById('portfolioList');
-    if (portfolioList) {
-        if (state.portfolio.length === 0) {
-            portfolioList.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-muted);">Aucun investissement. Commencez à acheter des planètes !</div>';
+    currentUser = data.user;
+    localStorage.setItem('gi_token', data.access_token);
+    localStorage.setItem('gi_email', email);
+    showDashboard(email);
+}
+
+async function handleRegister() {
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const confirm = document.getElementById('regConfirm').value;
+    if (!email || !password) { showMessage('regMessage', '⚠️ Tous les champs sont requis', 'error'); return; }
+    if (password.length < 8) { showMessage('regMessage', '⚠️ 8 caractères minimum', 'error'); return; }
+    if (password !== confirm) { showMessage('regMessage', '⚠️ Les mots de passe ne correspondent pas', 'error'); return; }
+    
+    const { ok, data } = await callSupabase('signup', { email, password });
+    if (!ok) { showMessage('regMessage', data.message || '❌ Erreur', 'error'); return; }
+    
+    currentEmail = email;
+    showOTPPanel(email);
+}
+
+function showOTPPanel(email) {
+    document.getElementById('otpEmail').innerText = email;
+    document.getElementById('loginForm').classList.remove('active');
+    document.getElementById('registerForm').classList.remove('active');
+    document.getElementById('otpPanel').classList.add('active');
+}
+
+async function verifyOTP() {
+    const boxes = document.querySelectorAll('.otp-box');
+    const token = Array.from(boxes).map(b => b.value).join('');
+    if (token.length !== 6) { showMessage('otpMessage', '⚠️ 6 chiffres requis', 'error'); return; }
+    
+    const { ok, data } = await callSupabase('verify', { type: 'email', email: currentEmail, token });
+    if (!ok) { showMessage('otpMessage', data.message || '❌ Code invalide', 'error'); return; }
+    
+    showMessage('otpMessage', '✅ Compte activé !', 'success');
+    setTimeout(() => showDashboard(currentEmail), 1500);
+}
+
+async function resendOTP() {
+    await callSupabase('resend', { type: 'signup', email: currentEmail });
+    showMessage('otpMessage', '📡 Nouveau code envoyé', 'success');
+}
+
+function showDashboard(email) {
+    document.getElementById('authScene').style.display = 'none';
+    document.getElementById('dashboard').classList.add('active');
+    document.getElementById('profileEmail').innerText = email;
+    loadUserData();
+    renderUI();
+    startMarketSimulation();
+    orionSay(`Bienvenue ${email.split('@')[0]} ! Je suis ORION, votre assistant financier. Commencez par explorer le marché des planètes.`);
+}
+
+function handleLogout() {
+    localStorage.clear();
+    document.getElementById('authScene').style.display = 'flex';
+    document.getElementById('dashboard').classList.remove('active');
+    location.reload();
+}
+
+// ==================================================
+// IA ORION - Interactive
+// ==================================================
+function orionSay(message, isUser = false) {
+    const container = document.getElementById('iaMessagesContainer');
+    const mobileContainer = document.getElementById('mobileIaMessages');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `ia-message ${isUser ? 'user' : 'orion'}`;
+    msgDiv.innerHTML = `<div class="ia-message-text">${message}</div>`;
+    if (container) container.appendChild(msgDiv);
+    if (mobileContainer) mobileContainer.appendChild(msgDiv);
+    container.scrollTop = container.scrollHeight;
+    if (mobileContainer) mobileContainer.scrollTop = mobileContainer.scrollHeight;
+    
+    // Micro-son
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = isUser ? 440 : 660;
+        gain.gain.value = 0.05;
+        osc.start();
+        gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.2);
+        osc.stop(audioCtx.currentTime + 0.15);
+    } catch(e) {}
+}
+
+function sendToOrion() {
+    const input = document.getElementById('iaInput');
+    const question = input.value.trim();
+    if (!question) return;
+    orionSay(question, true);
+    input.value = '';
+    
+    // Réponses intelligentes
+    setTimeout(() => {
+        const q = question.toLowerCase();
+        if (q.includes('roi') || q.includes('rendement')) {
+            orionSay('📈 Le ROI (Return on Investment) mesure la rentabilité d\'un investissement. Exemple: si vous achetez à 10€ et vendez à 12€, votre ROI est de 20% !');
+        } else if (q.includes('volatilité') || q.includes('risque')) {
+            orionSay('⚠️ La volatilité représente les fluctuations de prix. Une volatilité élevée = risque élevé mais potentiel de gain important. Diversifiez vos investissements !');
+        } else if (q.includes('intérêt') || q.includes('composé')) {
+            orionSay('✨ L\'intérêt composé est la "8ème merveille du monde". Vos gains génèrent des gains supplémentaires. Plus vous investissez tôt, plus l\'effet est puissant !');
         } else {
-            portfolioList.innerHTML = state.portfolio.map(item => {
-                const currentPlanet = state.planets.find(p => p.id === item.id);
-                const currentValue = currentPlanet ? currentPlanet.price * item.quantity : 0;
-                const buyValue = item.buyPrice * item.quantity;
-                const profit = currentValue - buyValue;
-                const profitPercent = buyValue > 0 ? (profit / buyValue * 100) : 0;
-                return `
-                    <div class="planet-card">
-                        <div class="planet-header">
-                            <span class="planet-icon">${item.icon}</span>
-                            <span class="planet-price">${currentPlanet ? currentPlanet.price.toFixed(2) : '0'} €</span>
-                        </div>
-                        <div class="planet-name">${item.name} x${item.quantity}</div>
-                        <div class="planet-roi">Prix d'achat: ${item.buyPrice.toFixed(2)} €</div>
-                        <div class="planet-volatility ${profit >= 0 ? 'positive' : 'negative'}">
-                            ${profit >= 0 ? '📈' : '📉'} ${profit.toFixed(2)} € (${profitPercent.toFixed(1)}%)
-                        </div>
-                    </div>
-                `;
-            }).join('');
+            orionSay('💡 Bonne question ! Je vous conseille de commencer par les planètes à faible volatilité (Luna Prime) pour apprendre. N\'hésitez pas à consulter les quêtes éducatives !');
         }
-    }
+    }, 300);
+}
+
+function sendToOrionMobile() {
+    const input = document.getElementById('mobileIaInput');
+    const question = input.value.trim();
+    if (!question) return;
+    orionSay(question, true);
+    input.value = '';
+    setTimeout(() => sendToOrion(), 100);
+}
+
+function orionReactToAction(action, details) {
+    const messages = {
+        buy: '🪐 Achat détecté ! Excellent choix. N\'oubliez pas de diversifier votre portefeuille pour réduire les risques.',
+        profit: '📈 Vous réalisez des bénéfices ! Pensez à réinvestir une partie pour profiter de l\'intérêt composé.',
+        levelup: '🎉 Félicitations ! Vous montez en niveau. Les investisseurs expérimentés gèrent mieux leur risque.'
+    };
+    orionSay(messages[action] || `👀 Je vois que vous avez ${action}. Continuez à apprendre !`);
+}
+
+// ==================================================
+// RENDER FUNCTIONS
+// ==================================================
+function renderUI() {
+    document.getElementById('balanceDisplay').innerHTML = `€${userBalance.toFixed(2)}`;
+    const portfolioValue = portfolio.reduce((sum, p) => sum + (planets.find(pl => pl.id === p.id)?.price || p.buyPrice) * p.quantity, 0);
+    document.getElementById('portfolioValue').innerHTML = `€${portfolioValue.toFixed(2)}`;
+    const profit = portfolioValue - portfolio.reduce((sum, p) => sum + p.buyPrice * p.quantity, 0);
+    document.getElementById('profitDisplay').innerHTML = `${profit >= 0 ? '+' : ''}€${profit.toFixed(2)}`;
+    document.getElementById('xpDisplay').innerHTML = userXP;
+    document.getElementById('sidebarLevel').innerHTML = Math.floor(userXP / 100) + 1;
+    document.getElementById('sidebarXpFill').style.width = `${userXP % 100}%`;
+    document.getElementById('sidebarRank').innerHTML = userXP < 100 ? 'Recrue' : userXP < 300 ? 'Navigateur' : userXP < 600 ? 'Explorateur' : 'Commandant';
     
-    // Activité
-    const activityLog = document.getElementById('activityLog');
-    if (activityLog) {
-        activityLog.innerHTML = state.activityLog.slice(0, 20).map(log => `
-            <div class="stat-card" style="padding: 12px;">
-                <div style="display: flex; justify-content: space-between;">
-                    <span style="font-weight: 600;">${log.action}</span>
-                    <span style="font-size: 0.7rem; color: var(--text-muted);">${log.time}</span>
-                </div>
-                <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">${log.details}</div>
-            </div>
-        `).join('');
-    }
+    const planetsGrid = document.getElementById('planetsGrid');
+    planetsGrid.innerHTML = planets.map(p => `
+        <div class="planet-card">
+            <div style="display: flex; justify-content: space-between;"><span class="planet-icon" style="font-size: 2rem;">${p.icon}</span><span style="font-size: 1.3rem; color: var(--gold);">${p.price.toFixed(2)}€</span></div>
+            <div style="font-weight: 600; margin: 8px 0;">${p.name}</div>
+            <div style="font-size: 0.7rem; color: var(--green);">ROI +${p.roi}%</div>
+            <button class="buy-btn" onclick="buyPlanet('${p.id}')">Acheter</button>
+        </div>
+    `).join('');
     
-    // Quêtes
-    const questsList = document.getElementById('questsList');
-    const quests = [
-        { id: 'first_buy', title: 'Premier achat', desc: 'Acheter votre première planète', xp: 20 },
-        { id: 'portfolio_100', title: 'Portefeuille 100€', desc: 'Atteindre 100€ de valeur totale', xp: 30 },
-        { id: 'diversify', title: 'Diversification', desc: 'Posséder 3 planètes différentes', xp: 40, check: () => new Set(state.portfolio.map(p => p.id)).size >= 3 },
-        { id: 'profit_50', title: 'Profit +50%', desc: 'Réaliser 50% de profit sur un actif', xp: 50 }
+    const portfolioList = document.getElementById('portfolioList');
+    if (portfolio.length === 0) portfolioList.innerHTML = '<div style="text-align: center; padding: 40px;">Aucun investissement pour le moment</div>';
+    else portfolioList.innerHTML = portfolio.map(item => {
+        const planet = planets.find(p => p.id === item.id);
+        const value = planet.price * item.quantity;
+        const profitPct = ((planet.price - item.buyPrice) / item.buyPrice * 100).toFixed(1);
+        return `<div class="planet-card"><div style="display: flex; justify-content: space-between;"><span style="font-size: 2rem;">${planet.icon}</span><span>${planet.price.toFixed(2)}€</span></div><div><strong>${planet.name}</strong> x${item.quantity}</div><div style="color: ${profitPct >= 0 ? 'var(--green)' : 'var(--red)'};">${profitPct >= 0 ? '+' : ''}${profitPct}%</div></div>`;
+    }).join('');
+    
+    const coursesList = document.getElementById('coursesList');
+    const courses = [
+        { id: 'intro', title: 'Introduction aux investissements', xp: 20, desc: 'Comprendre les bases de l\'investissement' },
+        { id: 'roi', title: 'Le ROI expliqué', xp: 30, desc: 'Comment calculer et interpréter le rendement' },
+        { id: 'risk', title: 'Gestion des risques', xp: 40, desc: 'Diversifier pour sécuriser ses investissements' }
     ];
-    
-    if (questsList) {
-        questsList.innerHTML = quests.map(quest => `
-            <div class="quest-item" onclick="completeQuestCheck('${quest.id}', '${quest.title}', ${quest.xp})">
-                <div class="quest-badge">${state.completedQuests.has(quest.id) ? '✅' : '🎯'}</div>
-                <div style="flex:1;">
-                    <div style="font-weight: 600; font-size: 0.75rem;">${quest.title}</div>
-                    <div style="font-size: 0.65rem; color: var(--text-muted);">${quest.desc}</div>
-                </div>
-                <div style="font-size: 0.65rem; color: var(--gold);">+${quest.xp} XP</div>
-            </div>
-        `).join('');
+    coursesList.innerHTML = courses.map(c => `
+        <div class="course-card">
+            <h3>📘 ${c.title}</h3>
+            <p style="color: var(--text-muted); font-size: 0.8rem;">${c.desc}</p>
+            <div class="course-progress"><div class="course-progress-fill" style="width: ${completedCourses.has(c.id) ? '100%' : '0%'}"></div></div>
+            ${!completedCourses.has(c.id) ? `<button class="buy-btn" onclick="completeCourse('${c.id}', ${c.xp})">Terminer +${c.xp} XP</button>` : '<span style="color: var(--green);">✅ Complété</span>'}
+        </div>
+    `).join('');
+}
+
+function buyPlanet(planetId) {
+    const planet = planets.find(p => p.id === planetId);
+    if (userBalance < planet.price) {
+        orionSay(`⚠️ Solde insuffisant ! Vous avez ${userBalance.toFixed(2)}€, besoin de ${planet.price.toFixed(2)}€.`);
+        return;
     }
+    userBalance -= planet.price;
+    const existing = portfolio.find(p => p.id === planetId);
+    if (existing) existing.quantity++;
+    else portfolio.push({ id: planetId, quantity: 1, buyPrice: planet.price });
     
-    // Quêtes éducatives (grille)
-    const questsGrid = document.getElementById('questsGrid');
-    if (questsGrid) {
-        questsGrid.innerHTML = quests.map(quest => `
-            <div class="planet-card">
-                <div class="planet-header">
-                    <span class="planet-icon">${state.completedQuests.has(quest.id) ? '🏆' : '📚'}</span>
-                    <span class="planet-price">+${quest.xp} XP</span>
-                </div>
-                <div class="planet-name">${quest.title}</div>
-                <div class="planet-roi">${quest.desc}</div>
-                <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 8px;">
-                    ${state.completedQuests.has(quest.id) ? '✅ Complété' : '⏳ En cours'}
-                </div>
-            </div>
-        `).join('');
+    userXP += 10;
+    orionSay(`✨ Achat réussi ! +10 XP. ${planet.name} ajouté à votre portefeuille.`);
+    orionReactToAction('buy', planet.name);
+    renderUI();
+}
+
+function completeCourse(courseId, xp) {
+    if (!completedCourses.has(courseId)) {
+        completedCourses.add(courseId);
+        userXP += xp;
+        orionSay(`🎓 Félicitations ! Cours complété, +${xp} XP. Continuez votre apprentissage !`);
+        renderUI();
     }
 }
 
-function completeQuestCheck(questId, title, xp) {
-    if (!AppState.completedQuests.has(questId)) {
-        AppState.completedQuests.add(questId);
-        AppState.addXp(xp, `Quête complétée: ${title}`);
-        AppState.addIaMessage(`🏅 Félicitations ! Vous avez complété la quête "${title}" et gagné ${xp} XP !`);
-        renderUI(AppState);
+function loadUserData() {
+    const saved = localStorage.getItem('gi_user_data');
+    if (saved) {
+        const data = JSON.parse(saved);
+        userBalance = data.balance || 5;
+        userXP = data.xp || 0;
+        portfolio = data.portfolio || [];
+        completedCourses = new Set(data.completed || []);
     }
+    setInterval(() => {
+        localStorage.setItem('gi_user_data', JSON.stringify({ balance: userBalance, xp: userXP, portfolio, completed: [...completedCourses] }));
+    }, 5000);
 }
 
-// ==================================================
-// SIMULATION DE MARCHÉ
-// ==================================================
 function startMarketSimulation() {
     setInterval(() => {
-        AppState.planets.forEach(planet => {
-            const oldPrice = planet.price;
-            planet.updatePrice();
-            const change = ((planet.price - oldPrice) / oldPrice * 100).toFixed(1);
-            if (Math.abs(change) > 3) {
-                AppState.addActivity('📊 MARCHÉ', `${planet.name} : ${change}%`);
-            }
+        planets.forEach(p => {
+            const change = (Math.random() - 0.5) * p.volatility * 0.2;
+            p.price = Math.max(p.basePrice * 0.7, Math.min(p.basePrice * 1.5, p.price * (1 + change)));
+            p.price = Math.round(p.price * 100) / 100;
         });
-        AppState.notify();
+        renderUI();
+        orionSay(`📊 Mise à jour du marché : les prix ont fluctué. Vérifiez votre portefeuille !`);
     }, 30000);
 }
 
-// ==================================================
-// NAVIGATION
-// ==================================================
+function togglePassword(id, btn) {
+    const input = document.getElementById(id);
+    if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
+    else { input.type = 'password'; btn.textContent = '👁️'; }
+}
+
+function showMessage(id, text, type) {
+    const el = document.getElementById(id);
+    el.className = `message ${type}`;
+    el.textContent = text;
+    setTimeout(() => { if (el) el.className = 'message'; }, 3000);
+}
+
+// Navigation
 function initNavigation() {
-    const views = ['market', 'portfolio', 'education', 'activity'];
-    const viewElements = {
-        market: document.getElementById('marketView'),
-        portfolio: document.getElementById('portfolioView'),
-        education: document.getElementById('educationView'),
-        activity: document.getElementById('activityView')
-    };
-    
-    function setActiveView(view) {
-        Object.keys(viewElements).forEach(v => {
-            if (viewElements[v]) viewElements[v].style.display = v === view ? 'block' : 'none';
-        });
-        
-        document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(btn => {
-            if (btn.dataset.view === view) btn.classList.add('active');
-            else btn.classList.remove('active');
-        });
-    }
-    
+    const views = { market: document.getElementById('marketView'), portfolio: document.getElementById('portfolioView'), education: document.getElementById('educationView'), profile: document.getElementById('profileView') };
     document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(btn => {
-        btn.addEventListener('click', () => setActiveView(btn.dataset.view));
-    });
-    
-    setActiveView('market');
-}
-
-// ==================================================
-// CANVAS ÉTOILES AVEC ACCÉLÉRATION
-// ==================================================
-function initStarCanvas() {
-    const canvas = document.getElementById('starCanvas');
-    const ctx = canvas.getContext('2d');
-    let stars = [];
-    let speedMultiplier = 1;
-    window.starSpeedMultiplier = 1;
-    
-    function resize() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        initStars();
-    }
-    
-    function initStars() {
-        stars = [];
-        const count = Math.floor(canvas.width * canvas.height / 2000);
-        for (let i = 0; i < count; i++) {
-            stars.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                radius: Math.random() * 1.8 + 0.3,
-                alpha: Math.random() * 0.5 + 0.2,
-                speedX: (Math.random() - 0.5) * 0.3,
-                speedY: (Math.random() - 0.5) * 0.3
-            });
-        }
-    }
-    
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        stars.forEach(star => {
-            star.x += star.speedX * (window.starSpeedMultiplier || 1);
-            star.y += star.speedY * (window.starSpeedMultiplier || 1);
-            
-            if (star.x < 0) star.x = canvas.width;
-            if (star.x > canvas.width) star.x = 0;
-            if (star.y < 0) star.y = canvas.height;
-            if (star.y > canvas.height) star.y = 0;
-            
-            ctx.beginPath();
-            ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(255, 235, 185, ${star.alpha * 0.7})`;
-            ctx.fill();
-        });
-        
-        requestAnimationFrame(animate);
-    }
-    
-    window.addEventListener('resize', resize);
-    resize();
-    animate();
-}
-
-// ==================================================
-// MOBILE IA OVERLAY
-// ==================================================
-function initMobileIa() {
-    const btn = document.getElementById('floatingIaBtn');
-    const overlay = document.getElementById('mobileIaOverlay');
-    const closeBtn = document.getElementById('closeIaOverlay');
-    
-    if (btn) {
         btn.addEventListener('click', () => {
-            overlay.classList.add('active');
-            AppState.updateIaPanel();
+            const view = btn.dataset.view;
+            Object.keys(views).forEach(v => { if (views[v]) views[v].style.display = v === view ? 'block' : 'none'; });
+            document.querySelectorAll('.nav-item, .bottom-nav-item').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
         });
-    }
-    if (closeBtn) {
-        closeBtn.addEventListener('click', () => {
-            overlay.classList.remove('active');
-        });
-    }
+    });
 }
 
-// ==================================================
-// INITIALISATION
-// ==================================================
-async function init() {
-    AppState.planets = initPlanets();
-    AppState.loadFromLocalStorage();
-    
-    // Bonus de bienvenue
-    if (AppState.activityLog.length === 0) {
-        AppState.addActivity('🚀 Bienvenue', '5€ de bonus offerts pour démarrer');
-        AppState.orionAdvise('Bienvenue à bord ! Explorez le marché, achetez des planètes et complétez vos quêtes éducatives.');
-    }
-    
-    renderUI(AppState);
-    initNavigation();
-    initStarCanvas();
-    initMobileIa();
-    startMarketSimulation();
-    
-    // Subscribe aux changements
-    AppState.subscribe(renderUI);
-    
-    // OTP et Auth seront intégrés dans la version finale
-    console.log('🚀 Galaxy Investor - ORION AI activé');
-}
+// OTP Boxes navigation
+document.querySelectorAll('.otp-box').forEach((box, idx, arr) => {
+    box.addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, ''); if (e.target.value && idx < 5) arr[idx + 1].focus(); });
+    box.addEventListener('keydown', e => { if (e.key === 'Backspace' && !box.value && idx > 0) arr[idx - 1].focus(); });
+});
 
-init();
+// Auth tabs
+document.querySelectorAll('.auth-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        const target = tab.dataset.tab;
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('loginForm').classList.toggle('active', target === 'login');
+        document.getElementById('registerForm').classList.toggle('active', target === 'register');
+        document.getElementById('otpPanel').classList.remove('active');
+    });
+});
+
+// Mobile IA
+document.getElementById('floatingIaBtn')?.addEventListener('click', () => document.getElementById('mobileIaOverlay').classList.add('active'));
+document.getElementById('closeIaOverlay')?.addEventListener('click', () => document.getElementById('mobileIaOverlay').classList.remove('active'));
+document.getElementById('mobileIaInput')?.addEventListener('keypress', e => { if (e.key === 'Enter') sendToOrionMobile(); });
+
+// Enter keys
+document.getElementById('loginPassword')?.addEventListener('keypress', e => { if (e.key === 'Enter') handleLogin(); });
+document.getElementById('regConfirm')?.addEventListener('keypress', e => { if (e.key === 'Enter') handleRegister(); });
+document.getElementById('iaInput')?.addEventListener('keypress', e => { if (e.key === 'Enter') sendToOrion(); });
+
+// Init
+init3DBackground();
+initNavigation();
+
+// Check session
+const token = localStorage.getItem('gi_token');
+const email = localStorage.getItem('gi_email');
+if (token && email) showDashboard(email);
 </script>
 </body>
 </html>

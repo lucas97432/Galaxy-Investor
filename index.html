@@ -1,470 +1,1531 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
-<meta name="theme-color" content="#020916"/>
-<meta name="apple-mobile-web-app-capable" content="yes"/>
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-<title>Galaxy Investor 2026</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
+<meta name="theme-color" content="#030014">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Galaxy Investor | Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ══════════════════════════════════════════════════
+/* ==================================================
    RESET & VARIABLES
-══════════════════════════════════════════════════ */
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --gold:#f0c040;--gold2:#fde27a;--gold3:#c08010;--gold4:#6a4a00;
-  --bg:#020916;--bg2:#040d1e;
-  --glass:rgba(4,10,24,0.82);--glass2:rgba(8,18,38,0.95);
-  --b:rgba(240,192,64,0.13);--b2:rgba(240,192,64,0.65);--b3:rgba(240,192,64,0.05);
-  --t:#dce8ff;--t2:#5a7898;--t3:#243648;
-  --red:#f03060;--red2:rgba(240,48,96,0.12);--red3:rgba(240,48,96,0.32);
-  --green:#20d07a;--green2:rgba(32,208,122,0.1);--green3:rgba(32,208,122,0.3);
-  --blue:#4080ff;--blue2:rgba(64,128,255,0.1);
-  --r:13px;--r2:20px;
-  --shadow:0 0 0 1px rgba(240,192,64,.05) inset,0 1px 0 rgba(240,192,64,.1) inset,0 52px 140px rgba(0,0,0,.9),0 0 100px rgba(50,10,160,.12);
-}
-html,body{height:100%;background:var(--bg);font-family:'Space Grotesk',sans-serif;color:var(--t);overflow:hidden;-webkit-font-smoothing:antialiased}
-
-/* ══════════════════════════════════════════════════
-   FOND ANIMÉ
-══════════════════════════════════════════════════ */
-#cv{position:fixed;inset:0;z-index:0}
-.nb{position:fixed;inset:0;z-index:1;pointer-events:none;
-  background:
-    radial-gradient(ellipse 55% 45% at 8% 12%,rgba(70,10,190,.26) 0%,transparent 65%),
-    radial-gradient(ellipse 48% 38% at 92% 88%,rgba(6,44,170,.2) 0%,transparent 65%),
-    radial-gradient(ellipse 38% 28% at 52% 4%,rgba(190,60,8,.11) 0%,transparent 58%),
-    radial-gradient(ellipse 30% 25% at 80% 20%,rgba(20,120,200,.08) 0%,transparent 60%);
-  animation:nbshift 18s ease-in-out infinite alternate}
-@keyframes nbshift{0%{opacity:.85}100%{opacity:1}}
-.grid{position:fixed;inset:0;z-index:2;pointer-events:none;
-  background-image:linear-gradient(rgba(240,192,64,.014) 1px,transparent 1px),linear-gradient(90deg,rgba(240,192,64,.014) 1px,transparent 1px);
-  background-size:52px 52px;animation:gm 28s linear infinite}
-@keyframes gm{to{background-position:52px 52px}}
-.pt{position:fixed;border-radius:50%;pointer-events:none;z-index:3;animation:pf linear infinite;opacity:0}
-@keyframes pf{0%{transform:translateY(110vh) scale(0);opacity:0}5%{opacity:.75;transform:translateY(92vh) scale(1)}93%{opacity:.12}100%{transform:translateY(-4vh) scale(.15);opacity:0}}
-
-/* ══════════════════════════════════════════════════
-   SCENE & CARD
-══════════════════════════════════════════════════ */
-.scene{position:relative;z-index:10;height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
-.card{
-  width:100%;max-width:432px;
-  background:var(--glass);
-  border:1px solid var(--b);
-  border-radius:var(--r2);
-  backdrop-filter:blur(56px) saturate(200%);
-  -webkit-backdrop-filter:blur(56px) saturate(200%);
-  overflow:hidden;position:relative;
-  box-shadow:var(--shadow);
-  animation:ci .9s cubic-bezier(.16,1,.3,1) both;
-}
-@keyframes ci{from{opacity:0;transform:translateY(48px) scale(.94)}to{opacity:1;transform:none}}
-.card::before{
-  content:'';position:absolute;top:0;left:6%;right:6%;height:1px;
-  background:linear-gradient(90deg,transparent,var(--gold4),var(--gold),var(--gold2),var(--gold),var(--gold4),transparent);
-  box-shadow:0 0 16px rgba(240,192,64,.25);z-index:5;
+================================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* HEADER */
-.hd{padding:28px 32px 18px;text-align:center;border-bottom:1px solid var(--b3);position:relative;overflow:hidden}
-.pw{display:inline-block;position:relative;margin-bottom:8px}
-.pl{font-size:2.4rem;display:block;animation:pfl 5s ease-in-out infinite;position:relative;z-index:2}
-@keyframes pfl{0%,100%{transform:translateY(0) rotate(-1deg);filter:drop-shadow(0 0 10px rgba(240,192,64,.55))}50%{transform:translateY(-9px) rotate(1deg);filter:drop-shadow(0 0 28px rgba(240,192,64,.95))}}
-.rg{position:absolute;top:50%;left:50%;width:68px;height:15px;border:1.5px solid rgba(240,192,64,.28);border-radius:50%;transform:translate(-50%,-50%) rotateX(74deg);animation:rgs 7s linear infinite;}
-@keyframes rgs{to{transform:translate(-50%,-50%) rotateX(74deg) rotateZ(360deg)}}
-.bn{font-family:'Orbitron',monospace;font-weight:900;font-size:1.15rem;letter-spacing:.18em;color:var(--gold);text-shadow:0 0 28px rgba(240,192,64,.35);position:relative;z-index:2}
-.bs{font-size:.55rem;color:var(--t3);letter-spacing:.3em;text-transform:uppercase;margin-top:3px;position:relative;z-index:2}
-.bdg{display:inline-flex;align-items:center;gap:5px;margin-top:7px;padding:3px 10px;background:rgba(32,208,122,.07);border:1px solid rgba(32,208,122,.15);border-radius:20px;font-size:.52rem;color:var(--green);letter-spacing:.1em;text-transform:uppercase;position:relative;z-index:2}
-.bdt{width:4px;height:4px;background:var(--green);border-radius:50%;animation:blink 2s ease infinite}
-@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 4px var(--green)}50%{opacity:.25;box-shadow:none}}
-
-/* TABS */
-.tabs{display:flex;border-bottom:1px solid var(--b3);position:relative}
-.tabs::after{content:'';position:absolute;bottom:0;height:1.5px;background:linear-gradient(90deg,transparent,var(--gold),transparent);box-shadow:0 0 10px var(--gold);width:50%;transition:left .32s cubic-bezier(.4,0,.2,1);left:0}
-.tabs.right::after{left:50%}
-.tab{flex:1;padding:12px 0;background:none;border:none;color:var(--t2);font-family:'Space Grotesk',sans-serif;font-size:.68rem;font-weight:600;letter-spacing:.13em;text-transform:uppercase;cursor:pointer;transition:color .26s;position:relative}
-.tab.on{color:var(--gold)}
-
-/* BODY & PANELS */
-.bd{padding:22px 32px 26px}
-.pan{display:none}.pan.on{display:block;animation:pi .28s cubic-bezier(.4,0,.2,1) both}
-@keyframes pi{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-
-/* FIELDS */
-.f{margin-bottom:12px}
-.fl{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
-.fl span{font-size:.58rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--t2)}
-.iw{position:relative}
-input.inp{
-  width:100%;padding:11px 42px 11px 13px;
-  background:rgba(255,255,255,.02);
-  border:1px solid var(--b);
-  border-radius:var(--r);
-  color:var(--t);
-  font-family:'Space Grotesk',sans-serif;font-size:.84rem;
-  outline:none;
-  transition:border-color .22s,box-shadow .22s,background .22s;
-  -webkit-appearance:none;
+:root {
+    --gold: #f5b042;
+    --gold-glow: #ffd966;
+    --gold-dark: #b87c1a;
+    --bg-deep: #030014;
+    --bg-card: rgba(8, 12, 28, 0.75);
+    --bg-glass: rgba(5, 8, 22, 0.85);
+    --border-glow: rgba(245, 176, 66, 0.25);
+    --text-primary: #ffffff;
+    --text-secondary: #8a9bb5;
+    --text-muted: #4a5a7a;
+    --green: #20d07a;
+    --green-glow: rgba(32, 208, 122, 0.5);
+    --red: #f04e6a;
+    --blue: #3a86ff;
+    --purple: #9b4dff;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-input.inp:focus{ border-color:var(--b2); background:rgba(240,192,64,.025); box-shadow:0 0 0 3px rgba(240,192,64,.08); }
-.ic{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:.78rem;opacity:.3;transition:opacity .22s}
-.eye{cursor:pointer;pointer-events:auto;opacity:.5}
-.eye:hover{opacity:1;color:var(--gold)}
 
-/* Force mdp */
-.pwb{height:2px;background:var(--b3);border-radius:2px;margin-top:4px;overflow:hidden}
-.pwf{height:100%;border-radius:2px;width:0;transition:width .32s,background .32s}
-.pwl{font-size:.52rem;color:var(--t3);margin-top:2px;height:11px}
-
-/* BOUTON */
-.btn{
-  width:100%;padding:12px;margin-top:8px;
-  background:linear-gradient(135deg,#7a5000,#e0a010 32%,#f0c040 50%,#fde27a 64%,#e0a010 78%,#7a5000);
-  background-size:280%;
-  border:none;border-radius:var(--r);
-  color:#010608;
-  font-family:'Orbitron',monospace;font-weight:900;font-size:.63rem;letter-spacing:.2em;text-transform:uppercase;
-  cursor:pointer;transition:all .44s;position:relative;overflow:hidden;
+body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    min-height: 100vh;
 }
-.btn:hover{background-position:right;transform:translateY(-2px);box-shadow:0 0 30px rgba(240,192,64,0.3);}
-.sp{display:inline-block;width:12px;height:12px;border:2px solid rgba(1,6,8,.22);border-top-color:#010608;border-radius:50%;animation:rot .65s linear infinite;vertical-align:middle;margin-right:7px}
-@keyframes rot{to{transform:rotate(360deg)}}
 
-/* MESSAGES */
-.msg{border-radius:var(--r);font-size:.71rem;line-height:1.5;padding:9px 12px;margin-top:10px;display:none;}
-.msg.e{background:var(--red2);border:1px solid var(--red3);color:var(--red);display:block}
-.msg.s{background:var(--green2);border:1px solid var(--green3);color:var(--green);display:block}
-.msg.i{background:var(--blue2);border:1px solid rgba(64,128,255,.3);color:var(--blue);display:block}
-
-/* OTP */
-.otp{display:none}.otp.on{display:block;animation:pi .34s ease both}
-.boxes{display:flex;gap:7px;justify-content:center;margin:14px 0 4px}
-.box{
-  width:44px;height:54px;text-align:center;font-family:'Orbitron',monospace;font-size:1.25rem;font-weight:900;
-  color:var(--gold);background:rgba(240,192,64,.04);border:1.5px solid var(--b);border-radius:var(--r);outline:none;
+/* ==================================================
+   CANVAS ÉTOILÉ 3D
+================================================== */
+#starCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
 }
-.box:focus{border-color:var(--gold);background:rgba(240,192,64,.09);transform:scale(1.06)}
 
-/* OVERLAY SUCCÈS */
-.sov{display:none;position:fixed;inset:0;z-index:500;background:rgba(2,9,22,.97);align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:24px}
-.sov.on{display:flex;animation:fadeIn .5s ease}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.st{font-family:'Orbitron',monospace;font-weight:900;font-size:1.2rem;color:var(--gold);margin-bottom:7px;letter-spacing:.1em}
-.sbw{width:190px;height:2px;background:rgba(240,192,64,.08);border-radius:2px;overflow:hidden}
-.sbf{height:100%;background:var(--gold);width:0;transition:width 2.2s linear}
-
-/* ══════════════════════════════════════════════════
-   NOUVEAU DASHBOARD ÉLITE
-══════════════════════════════════════════════════ */
-.dash-container {
-  display:none; position:fixed; inset:0; z-index:400; background:var(--bg);
-  flex-direction:column; padding:20px; overflow-y:auto;
+.overlay-gradient {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(3, 0, 20, 0.4) 0%, rgba(3, 0, 20, 0.95) 100%);
+    pointer-events: none;
+    z-index: 1;
 }
-.dash-container.on { display:flex; animation:pi 0.5s ease; }
-.dash-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; }
-.dash-card-main {
-  background: linear-gradient(135deg, rgba(240,192,64,0.15), rgba(0,0,0,0.6));
-  border: 1px solid var(--gold3); border-radius: 20px; padding: 30px;
-  text-align: center; margin-bottom: 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-}
-.dash-balance { font-family: 'Orbitron'; font-size: 2.8rem; color: var(--gold); text-shadow: 0 0 20px rgba(240,192,64,0.4); margin: 10px 0; }
-.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-.stat-box { background: var(--glass2); border: 1px solid var(--b3); padding: 15px; border-radius: 15px; text-align: center; }
-.stat-label { font-size: 0.55rem; color: var(--t2); letter-spacing: 1px; text-transform: uppercase; }
-.stat-val { font-family: 'Orbitron'; font-size: 0.9rem; color: var(--gold2); margin-top: 5px; }
 
-.ft{padding:10px 32px 14px;border-top:1px solid var(--b3);text-align:center}
-.ft p{font-size:.54rem;color:var(--t3);line-height:1.9}
+/* ==================================================
+   SCENE PRINCIPALE
+================================================== */
+.scene {
+    position: relative;
+    z-index: 10;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* ==================================================
+   CARD CONNEXION
+================================================== */
+.auth-card {
+    max-width: 460px;
+    width: 100%;
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-glow);
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(245, 176, 66, 0.1) inset;
+    animation: fadeInUp 0.6s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.auth-header {
+    padding: 32px 28px 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(245, 176, 66, 0.15);
+    position: relative;
+}
+
+.logo-icon {
+    font-size: 3.5rem;
+    display: inline-block;
+    animation: float 4s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(245, 176, 66, 0.6));
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-8px) rotate(3deg); }
+}
+
+.logo-text {
+    font-family: 'Orbitron', monospace;
+    font-weight: 900;
+    font-size: 1.4rem;
+    letter-spacing: 0.2em;
+    background: linear-gradient(135deg, var(--gold), var(--gold-glow));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-top: 8px;
+}
+
+.logo-badge {
+    font-size: 0.55rem;
+    color: var(--text-muted);
+    letter-spacing: 0.3em;
+    margin-top: 6px;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 4px 12px;
+    background: rgba(32, 208, 122, 0.1);
+    border: 1px solid rgba(32, 208, 122, 0.2);
+    border-radius: 40px;
+    font-size: 0.6rem;
+    color: var(--green);
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 1.5s ease infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+/* ==================================================
+   TABS
+================================================== */
+.auth-tabs {
+    display: flex;
+    position: relative;
+    border-bottom: 1px solid rgba(245, 176, 66, 0.1);
+}
+
+.auth-tab {
+    flex: 1;
+    padding: 14px 0;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+}
+
+.auth-tab.active {
+    color: var(--gold);
+}
+
+.auth-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 20%;
+    width: 60%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), var(--gold-glow), transparent);
+    border-radius: 2px;
+}
+
+/* ==================================================
+   FORMULAIRES
+================================================== */
+.auth-body {
+    padding: 28px 28px 24px;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-field {
+    width: 100%;
+    padding: 14px 48px 14px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(245, 176, 66, 0.2);
+    border-radius: 16px;
+    color: var(--text-primary);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: var(--transition);
+}
+
+.input-field:focus {
+    border-color: var(--gold);
+    background: rgba(245, 176, 66, 0.05);
+    box-shadow: 0 0 0 3px rgba(245, 176, 66, 0.1);
+}
+
+.input-icon {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.eye-btn {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: var(--transition);
+    color: var(--text-secondary);
+}
+
+.eye-btn:hover {
+    opacity: 1;
+    color: var(--gold);
+}
+
+/* Force mot de passe */
+.password-strength {
+    margin-top: 8px;
+}
+
+.strength-bar {
+    height: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.strength-fill {
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease, background 0.3s ease;
+    border-radius: 3px;
+}
+
+.strength-text {
+    font-size: 0.6rem;
+    margin-top: 5px;
+    color: var(--text-muted);
+}
+
+/* Tentatives */
+.attempt-counter {
+    font-size: 0.6rem;
+    text-align: right;
+    margin-top: 5px;
+    color: var(--text-muted);
+}
+
+.attempt-counter.warning {
+    color: var(--gold);
+}
+
+.attempt-counter.danger {
+    color: var(--red);
+}
+
+/* Bouton */
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    margin-top: 12px;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-glow));
+    border: none;
+    border-radius: 40px;
+    color: #030014;
+    font-family: 'Orbitron', monospace;
+    font-weight: 800;
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(245, 176, 66, 0.3);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    transform: none;
+    cursor: not-allowed;
+}
+
+/* Messages */
+.message {
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: 0.75rem;
+    margin-top: 12px;
+    display: none;
+}
+
+.message.error {
+    background: rgba(240, 78, 106, 0.1);
+    border: 1px solid rgba(240, 78, 106, 0.3);
+    color: var(--red);
+    display: block;
+}
+
+.message.success {
+    background: rgba(32, 208, 122, 0.1);
+    border: 1px solid rgba(32, 208, 122, 0.3);
+    color: var(--green);
+    display: block;
+}
+
+.message.info {
+    background: rgba(58, 134, 255, 0.1);
+    border: 1px solid rgba(58, 134, 255, 0.3);
+    color: var(--blue);
+    display: block;
+}
+
+/* OTP Panel */
+.otp-panel {
+    display: none;
+}
+
+.otp-panel.active {
+    display: block;
+    animation: fadeIn 0.4s ease;
+}
+
+.otp-header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.otp-icon {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+}
+
+.otp-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 1rem;
+    color: var(--gold);
+}
+
+.otp-expiry {
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin: 16px 0;
+    overflow: hidden;
+}
+
+.expiry-bar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-glow));
+    transition: width 0.5s linear;
+}
+
+.otp-boxes {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.otp-box {
+    width: 48px;
+    height: 56px;
+    text-align: center;
+    font-family: 'Orbitron', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(245, 176, 66, 0.3);
+    border-radius: 14px;
+    color: var(--gold);
+    outline: none;
+}
+
+.otp-box:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(245, 176, 66, 0.2);
+}
+
+.resend-link {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.resend-btn {
+    background: none;
+    border: none;
+    color: var(--gold);
+    cursor: pointer;
+    font-size: 0.7rem;
+    text-decoration: underline;
+}
+
+/* ==================================================
+   DASHBOARD - STYLE eTORO PRO
+================================================== */
+.dashboard {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: var(--bg-deep);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.dashboard.active {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Dashboard */
+.dash-header {
+    position: sticky;
+    top: 0;
+    background: rgba(3, 0, 20, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 18px 20px;
+    border-bottom: 1px solid rgba(245, 176, 66, 0.15);
+    z-index: 20;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dash-logo {
+    font-family: 'Orbitron', monospace;
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+}
+
+.dash-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dash-email {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+.logout-btn {
+    background: rgba(240, 78, 106, 0.1);
+    border: 1px solid rgba(240, 78, 106, 0.3);
+    padding: 6px 14px;
+    border-radius: 40px;
+    color: var(--red);
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.logout-btn:hover {
+    background: rgba(240, 78, 106, 0.2);
+}
+
+/* Stats Cards */
+.dash-stats {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(245, 176, 66, 0.1);
+    border-radius: 24px;
+    padding: 18px 16px;
+    transition: var(--transition);
+}
+
+.stat-card:hover {
+    border-color: rgba(245, 176, 66, 0.3);
+    transform: translateY(-2px);
+}
+
+.stat-icon {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
+
+.stat-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--gold);
+}
+
+.stat-change {
+    font-size: 0.7rem;
+    margin-top: 5px;
+}
+
+.stat-change.positive {
+    color: var(--green);
+}
+
+.stat-change.negative {
+    color: var(--red);
+}
+
+/* Section Welcome */
+.welcome-section {
+    padding: 0 20px 20px;
+}
+
+.welcome-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.2rem;
+    margin-bottom: 6px;
+}
+
+.welcome-sub {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+/* Pilotes en ligne */
+.pilots-online {
+    padding: 0 20px 16px;
+}
+
+.pilot-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(32, 208, 122, 0.1);
+    border: 1px solid rgba(32, 208, 122, 0.2);
+    border-radius: 40px;
+    font-size: 0.7rem;
+}
+
+.pilot-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 1.5s ease infinite;
+}
+
+/* Planètes Section */
+.planets-section {
+    padding: 0 20px 20px;
+}
+
+.section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.planets-grid {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+}
+
+.planet-card {
+    min-width: 140px;
+    background: var(--bg-card);
+    border: 1px solid rgba(245, 176, 66, 0.15);
+    border-radius: 20px;
+    padding: 14px;
+    text-align: center;
+    transition: var(--transition);
+}
+
+.planet-card:hover {
+    border-color: var(--gold);
+    transform: translateY(-3px);
+}
+
+.planet-icon {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.planet-name {
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+}
+
+.planet-price {
+    font-size: 0.7rem;
+    color: var(--gold);
+    font-weight: 500;
+}
+
+.planet-roi {
+    font-size: 0.65rem;
+    color: var(--green);
+    margin-top: 5px;
+}
+
+/* Menu Bottom Navigation */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(3, 0, 20, 0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(245, 176, 66, 0.15);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 20px 20px;
+    z-index: 30;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.6rem;
+    cursor: pointer;
+    transition: var(--transition);
+    padding: 6px 12px;
+    border-radius: 40px;
+}
+
+.nav-item.active {
+    color: var(--gold);
+    background: rgba(245, 176, 66, 0.1);
+}
+
+.nav-icon {
+    font-size: 1.3rem;
+}
+
+/* Footer spacer pour bottom nav */
+.dash-footer-spacer {
+    height: 80px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .auth-card {
+        margin: 16px;
+    }
+    
+    .stat-value {
+        font-size: 1.1rem;
+    }
+    
+    .otp-box {
+        width: 42px;
+        height: 50px;
+        font-size: 1.2rem;
+    }
+    
+    .planets-grid {
+        gap: 10px;
+    }
+    
+    .planet-card {
+        min-width: 120px;
+    }
+}
+
+@media (min-width: 768px) {
+    .dash-stats {
+        grid-template-columns: repeat(4, 1fr);
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+    }
+    
+    .welcome-section, .pilots-online, .planets-section {
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+    }
+    
+    .planets-grid {
+        justify-content: flex-start;
+    }
+}
 </style>
 </head>
 <body>
-<canvas id="cv"></canvas>
-<div class="nb"></div>
-<div class="grid"></div>
-<div id="pts"></div>
 
-<div class="sov" id="SOV">
-  <div style="font-size:4rem; margin-bottom:20px">🚀</div>
-  <div class="st">ACCÈS AUTORISÉ</div>
-  <div id="SEML" style="color:var(--t2); font-size:0.7rem; margin-bottom:20px"></div>
-  <div class="sbw"><div class="sbf" id="SBF"></div></div>
+<canvas id="starCanvas"></canvas>
+<div class="overlay-gradient"></div>
+
+<!-- SCENE CONNEXION -->
+<div class="scene" id="authScene">
+    <div class="auth-card">
+        <div class="auth-header">
+            <span class="logo-icon">🪐</span>
+            <div class="logo-text">GALAXY INVESTOR</div>
+            <div class="logo-badge">✦ PLATEFORME D'INVESTISSEMENT SPATIAL ✦</div>
+            <div class="status-badge">
+                <span class="status-dot"></span>
+                SÉCURISÉ SUPABASE • CHIFFRÉ SSL
+            </div>
+        </div>
+        
+        <div class="auth-tabs">
+            <button class="auth-tab active" data-tab="login">Connexion</button>
+            <button class="auth-tab" data-tab="register">Inscription</button>
+        </div>
+        
+        <div class="auth-body">
+            <!-- PANEL CONNEXION -->
+            <div id="loginPanel">
+                <div class="form-group">
+                    <div class="form-label">E-mail</div>
+                    <div class="input-wrapper">
+                        <input type="email" id="loginEmail" class="input-field" placeholder="pilote@galaxie.io">
+                        <span class="input-icon">✉️</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-label">Mot de passe</div>
+                    <div class="input-wrapper">
+                        <input type="password" id="loginPassword" class="input-field" placeholder="••••••••">
+                        <button class="eye-btn" onclick="togglePassword('loginPassword', this)">👁️</button>
+                    </div>
+                </div>
+                <div class="attempt-counter" id="loginAttempts"></div>
+                <div class="message" id="loginMessage"></div>
+                <button class="btn-primary" id="loginBtn" onclick="handleLogin()">ENTRER DANS LA GALAXIE</button>
+            </div>
+            
+            <!-- PANEL INSCRIPTION -->
+            <div id="registerPanel" style="display: none;">
+                <div class="form-group">
+                    <div class="form-label">E-mail</div>
+                    <div class="input-wrapper">
+                        <input type="email" id="regEmail" class="input-field" placeholder="pilote@galaxie.io">
+                        <span class="input-icon">✉️</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-label">Mot de passe</div>
+                    <div class="input-wrapper">
+                        <input type="password" id="regPassword" class="input-field" placeholder="8 caractères minimum" oninput="updatePasswordStrength()">
+                        <button class="eye-btn" onclick="togglePassword('regPassword', this)">👁️</button>
+                    </div>
+                    <div class="password-strength">
+                        <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+                        <div class="strength-text" id="strengthText"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-label">Confirmer</div>
+                    <div class="input-wrapper">
+                        <input type="password" id="regConfirm" class="input-field" placeholder="Répétez le mot de passe">
+                        <span class="input-icon">🔒</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-label">Code parrainage <span style="opacity:0.5;">(optionnel)</span></div>
+                    <div class="input-wrapper">
+                        <input type="text" id="regReferral" class="input-field" placeholder="GAL-XXXX">
+                        <span class="input-icon">🌟</span>
+                    </div>
+                </div>
+                <div class="attempt-counter" id="regAttempts"></div>
+                <div class="message" id="regMessage"></div>
+                <button class="btn-primary" id="registerBtn" onclick="handleRegister()">CRÉER MON COMPTE</button>
+            </div>
+            
+            <!-- PANEL OTP -->
+            <div id="otpPanel" class="otp-panel">
+                <div class="otp-header">
+                    <div class="otp-icon">📡</div>
+                    <div class="otp-title">VÉRIFICATION REQUISE</div>
+                    <div style="font-size:0.7rem; margin-top:5px;">Code envoyé à <strong id="otpEmail"></strong></div>
+                </div>
+                <div class="otp-expiry"><div class="expiry-bar" id="expiryBar"></div></div>
+                <div class="otp-boxes" id="otpBoxes">
+                    <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+                    <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+                    <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+                    <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+                    <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+                    <input type="text" class="otp-box" maxlength="1" inputmode="numeric">
+                </div>
+                <div class="message" id="otpMessage"></div>
+                <button class="btn-primary" onclick="verifyOTP()">VALIDER LE CODE</button>
+                <div class="resend-link">
+                    Pas reçu ? <button class="resend-btn" onclick="resendOTP()">Renvoyer</button>
+                    <span id="resendTimer"></span>
+                </div>
+            </div>
+        </div>
+        
+        <div style="padding: 16px 28px 24px; border-top: 1px solid rgba(245,176,66,0.1); text-align: center;">
+            <p style="font-size:0.55rem; color:#4a5a7a;">🔒 Chiffrement SSL • Sécurisé par Supabase • Tracking LogSnag</p>
+        </div>
+    </div>
 </div>
 
-<div class="dash-container" id="DASH">
-  <div class="dash-header">
-    <div>
-      <div style="font-family:'Orbitron'; font-size:0.8rem; color:var(--gold)">GALAXY INVESTOR</div>
-      <div id="D_EMAIL" style="font-size:0.6rem; color:var(--t2)"></div>
-    </div>
-    <button class="tab" style="max-width:100px; border:1px solid var(--b3); border-radius:8px" onclick="doLogout()">QUITTER</button>
-  </div>
-
-  <div class="dash-card-main">
-    <div class="stat-label">SOLDE DISPONIBLE</div>
-    <div id="db_balance" class="dash-balance">5.00 €</div>
-    <div id="db_rank" style="font-size:0.6rem; color:var(--green); letter-spacing:2px">RANK : RECRUE SPATIALE</div>
-  </div>
-
-  <div class="dash-grid">
-    <div class="stat-box">
-      <div class="stat-label">Profits</div>
-      <div class="stat-val" id="db_profit">0.00 €</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-label">Filleuls</div>
-      <div class="stat-val" id="db_refs">0</div>
-    </div>
-  </div>
-
-  <div style="margin-top:25px">
-    <button class="btn" onclick="alert('Ouverture du Marché Prochainement')">🚀 INVESTIR DANS UNE PLANÈTE</button>
-    <button class="btn" style="background:var(--glass2); color:var(--t2); margin-top:10px" onclick="alert('Retrait disponible à partir de 50€')">💸 RETIRER MES GAINS</button>
-  </div>
-</div>
-
-<div class="scene">
-<div class="card">
-  <div class="hd">
-    <div class="pw"><span class="pl">🪐</span><div class="rg"></div></div>
-    <div class="bn">GALAXY INVESTOR</div>
-    <div class="bs">Plateforme d'investissement · 2026</div>
-    <div class="bdg"><span class="bdt"></span>Connexion chiffrée SSL</div>
-  </div>
-
-  <div class="tabs" id="TABS">
-    <button class="tab on" id="tL" onclick="goTab('L')">Connexion</button>
-    <button class="tab" id="tS" onclick="goTab('S')">Inscription</button>
-  </div>
-
-  <div class="bd">
-    <div class="pan on" id="pL">
-      <div class="f">
-        <div class="fl"><span>E-mail</span></div>
-        <div class="iw">
-          <input class="inp" type="email" id="lE" placeholder="pilote@galaxie.io"/>
-          <span class="ic">✉</span>
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+    <div class="dash-header">
+        <div class="dash-logo">🪐 GALAXY INVESTOR</div>
+        <div class="dash-user">
+            <span class="dash-email" id="dashEmail">pilote@galaxie.io</span>
+            <button class="logout-btn" onclick="handleLogout()">Déconnexion</button>
         </div>
-      </div>
-      <div class="f">
-        <div class="fl"><span>Mot de passe</span></div>
-        <div class="iw">
-          <input class="inp" type="password" id="lP" placeholder="••••••••"/>
-          <span class="ic eye" onclick="togglePw('lP', this)">👁️</span>
+    </div>
+    
+    <div class="dash-stats">
+        <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-label">SOLDE TOTAL</div>
+            <div class="stat-value" id="statBalance">5.00 €</div>
+            <div class="stat-change positive">+0.00 €</div>
         </div>
-      </div>
-      <div class="msg" id="lM"></div>
-      <button class="btn" id="lB" onclick="doLogin()">Entrer dans la galaxie</button>
-    </div>
-
-    <div class="pan" id="pS">
-      <div class="f">
-        <div class="fl"><span>E-mail</span></div>
-        <div class="iw"><input class="inp" type="email" id="sE" placeholder="pilote@galaxie.io"/><span class="ic">✉</span></div>
-      </div>
-      <div class="f">
-        <div class="fl"><span>Mot de passe</span></div>
-        <div class="iw">
-          <input class="inp" type="password" id="sP" oninput="pwStr()"/><span class="ic eye" onclick="togglePw('sP', this)">👁️</span>
+        <div class="stat-card">
+            <div class="stat-icon">📈</div>
+            <div class="stat-label">PROFITS</div>
+            <div class="stat-value" id="statProfit">0.00 €</div>
+            <div class="stat-change positive">+0%</div>
         </div>
-        <div class="pwb"><div class="pwf" id="PWF"></div></div>
-        <div class="pwl" id="PWL"></div>
-      </div>
-      <div class="f">
-        <div class="fl"><span>Confirmer</span></div>
-        <div class="iw"><input class="inp" type="password" id="sC"/><span class="ic">🔒</span></div>
-      </div>
-      <div class="msg" id="sM"></div>
-      <button class="btn" id="sB" onclick="doSignup()">Créer mon compte</button>
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-label">FILLEULS</div>
+            <div class="stat-value" id="statReferrals">0</div>
+            <div class="stat-change">⭐ Actif</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🏆</div>
+            <div class="stat-label">RANG</div>
+            <div class="stat-value" id="statRank">Recrue</div>
+            <div class="stat-change">Pilote</div>
+        </div>
     </div>
-
-    <div class="otp" id="OTP">
-      <div style="text-align:center; margin-bottom:20px">
-        <div class="st">VÉRIFICATION</div>
-        <div style="font-size:0.7rem; color:var(--t2)">Code envoyé à <strong id="OE"></strong></div>
-      </div>
-      <div class="boxes">
-        <input class="box" type="text" maxlength="1" inputmode="numeric"/>
-        <input class="box" type="text" maxlength="1" inputmode="numeric"/>
-        <input class="box" type="text" maxlength="1" inputmode="numeric"/>
-        <input class="box" type="text" maxlength="1" inputmode="numeric"/>
-        <input class="box" type="text" maxlength="1" inputmode="numeric"/>
-        <input class="box" type="text" maxlength="1" inputmode="numeric"/>
-      </div>
-      <div class="msg" id="oM"></div>
-      <button class="btn" id="oB" onclick="doOTP()">Valider</button>
+    
+    <div class="welcome-section">
+        <div class="welcome-title">Bienvenue, Pilote 👨‍🚀</div>
+        <div class="welcome-sub">Votre empire galactique vous attend. Investissez dans les planètes les plus prometteuses et regardez votre portefeuille grandir.</div>
     </div>
-  </div>
-
-  <div class="ft">
-    <p>🔒 Chiffrement SSL · Sécurisé par Supabase<br/>© 2026 GALAXY INVESTOR</p>
-  </div>
-</div>
+    
+    <div class="pilots-online">
+        <div class="pilot-badge">
+            <span class="pilot-dot"></span>
+            <span id="pilotsCount">1 247</span> pilotes en ligne actuellement
+        </div>
+    </div>
+    
+    <div class="planets-section">
+        <div class="section-title">
+            <span>🪐</span> MARCHÉ DES PLANÈTES
+        </div>
+        <div class="planets-grid" id="planetsGrid">
+            <div class="planet-card">
+                <div class="planet-icon">🌕</div>
+                <div class="planet-name">Luna Prime</div>
+                <div class="planet-price">5.00 €</div>
+                <div class="planet-roi">ROI +12%</div>
+            </div>
+            <div class="planet-card">
+                <div class="planet-icon">🔴</div>
+                <div class="planet-name">Mars Colony</div>
+                <div class="planet-price">12.00 €</div>
+                <div class="planet-roi">ROI +8.5%</div>
+            </div>
+            <div class="planet-card">
+                <div class="planet-icon">🪐</div>
+                <div class="planet-name">Saturn Ring</div>
+                <div class="planet-price">25.00 €</div>
+                <div class="planet-roi">ROI +15%</div>
+            </div>
+            <div class="planet-card">
+                <div class="planet-icon">🌍</div>
+                <div class="planet-name">Terra Nova</div>
+                <div class="planet-price">8.50 €</div>
+                <div class="planet-roi">ROI +6%</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="dash-footer-spacer"></div>
+    
+    <div class="bottom-nav">
+        <button class="nav-item active" data-nav="home">
+            <span class="nav-icon">🏠</span>
+            <span>Accueil</span>
+        </button>
+        <button class="nav-item" data-nav="market">
+            <span class="nav-icon">🪐</span>
+            <span>Marché</span>
+        </button>
+        <button class="nav-item" data-nav="portfolio">
+            <span class="nav-icon">💰</span>
+            <span>Portefeuille</span>
+        </button>
+        <button class="nav-item" data-nav="profile">
+            <span class="nav-icon">👤</span>
+            <span>Profil</span>
+        </button>
+    </div>
 </div>
 
 <script>
-'use strict';
-const SB_URL = 'https://fwkisfdoqazapjdnhmwb.supabase.co';
-const SB_KEY = 'sb_publishable_MSJBTK0-UaBjtoeQTgJ1XQ_pvS3NM_h';
-const H = { 'Content-Type':'application/json', 'apikey':SB_KEY, 'Authorization':'Bearer '+SB_KEY };
+// ==================================================
+// CONFIGURATION SUPABASE (INCHANGÉE)
+// ==================================================
+const SUPABASE_URL = 'https://fwkisfdoqazapjdnhmwb.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_MSJBTK0-UaBjtoeQTgJ1XQ_pvS3NM_h';
 
-const LS_KEY = 'e6fa992cf0de8f0df0daade72d70954f';
-const LS_PROJ = 'galaxy-investor';
+// LogSnag
+const LOGSNAG_KEY = 'e6fa992cf0de8f0df0daade72d70954f';
+const LOGSNAG_PROJECT = 'galaxy-investor';
 
-// VIBRATION MOBILE
-function vibe(type='error') {
-  if(!navigator.vibrate) return;
-  type === 'error' ? navigator.vibrate([50, 100, 50]) : navigator.vibrate(30);
-}
+// État global
+let currentEmail = '';
+let otpTimer = null;
+let resendTimer = null;
+let expiryEnd = 0;
 
-// OEIL MAGIQUE
-function togglePw(id, el) {
-  const i = document.getElementById(id);
-  if(i.type === 'password') { i.type = 'text'; el.textContent = '🕶️'; }
-  else { i.type = 'password'; el.textContent = '👁️'; }
-}
-
-async function alertLogSnag(event, channel, description, icon='🔔') {
-  try {
+// ==================================================
+// UTILITAIRES
+// ==================================================
+function logSnag(event, channel, description, icon = '🔔') {
     fetch('https://api.logsnag.com/v1/log', {
-      method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+LS_KEY},
-      body:JSON.stringify({project:LS_PROJ, channel, event, description, icon, notify:true})
-    });
-  } catch(e){}
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + LOGSNAG_KEY
+        },
+        body: JSON.stringify({
+            project: LOGSNAG_PROJECT,
+            channel: channel,
+            event: event,
+            description: description,
+            icon: icon,
+            notify: true
+        })
+    }).catch(() => console.log('LogSnag offline'));
 }
 
-async function sbAuth(path, body) {
-  const r = await fetch(SB_URL + '/auth/v1/' + path, { method:'POST', headers:H, body:JSON.stringify(body)});
-  const data = await r.json(); return { ok: r.ok && !data.error, data };
-}
-
-// CHARGER LES STATS (LE BONUS DE 5€)
-async function loadStats() {
-  const user = JSON.parse(localStorage.getItem('gi_user'));
-  if(!user) return;
-  try {
-    const r = await fetch(`${SB_URL}/rest/v1/user_stats?id=eq.${user.id}`, { headers:H });
-    const d = await r.json();
-    if(d && d[0]) {
-      document.getElementById('db_balance').textContent = parseFloat(d[0].balance).toFixed(2) + " €";
-      document.getElementById('db_profit').textContent = parseFloat(d[0].total_profit).toFixed(2) + " €";
-      document.getElementById('db_refs').textContent = d[0].referral_count || 0;
-      document.getElementById('db_rank').textContent = "RANK : " + d[0].rank.toUpperCase();
+function vibrate(duration = 50) {
+    if (window.navigator && window.navigator.vibrate) {
+        window.navigator.vibrate(duration);
     }
-  } catch(e) { console.error(e); }
 }
 
-function saveSession(data, email) {
-  localStorage.setItem('gi_token', data.access_token);
-  localStorage.setItem('gi_user', JSON.stringify(data.user));
-  localStorage.setItem('gi_email', email);
-  localStorage.setItem('gi_time', Date.now());
+function playBeep(type = 'success') {
+    // Micro-son discret (simulé via AudioContext)
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.frequency.value = type === 'success' ? 880 : 440;
+        gainNode.gain.value = 0.1;
+        oscillator.start();
+        gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.3);
+        oscillator.stop(audioCtx.currentTime + 0.2);
+    } catch(e) { /* fallback silencieux */ }
 }
 
-function doLogout() {
-  localStorage.clear(); location.reload();
+function showMessage(elementId, text, type) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+    el.className = `message ${type}`;
+    el.textContent = text;
 }
 
-function showM(id,txt,type){
-  const e=document.getElementById(id); e.className='msg '+type; e.textContent=txt;
-  if(type === 'e') vibe('error');
+function hideMessage(elementId) {
+    const el = document.getElementById(elementId);
+    if (el) {
+        el.className = 'message';
+        el.textContent = '';
+    }
 }
 
-function goTab(t) {
-  ['L','S'].forEach(x => {
-    document.getElementById('t'+x).classList.toggle('on', x===t);
-    document.getElementById('p'+x).classList.toggle('on', x===t);
-  });
-  document.getElementById('TABS').classList.toggle('right', t==='S');
+// ==================================================
+// FORCE MOT DE PASSE
+// ==================================================
+function updatePasswordStrength() {
+    const password = document.getElementById('regPassword').value;
+    const fill = document.getElementById('strengthFill');
+    const text = document.getElementById('strengthText');
+    
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (password.length >= 12) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^a-zA-Z0-9]/.test(password)) score++;
+    
+    const strengths = [
+        { width: '0%', color: '#4a5a7a', text: '' },
+        { width: '20%', color: '#f04e6a', text: 'Très faible' },
+        { width: '40%', color: '#f5b042', text: 'Faible' },
+        { width: '60%', color: '#f5b042', text: 'Moyen' },
+        { width: '80%', color: '#20d07a', text: 'Fort' },
+        { width: '100%', color: '#20d07a', text: 'Très fort 🔥' }
+    ];
+    const idx = Math.min(score, 5);
+    fill.style.width = strengths[idx].width;
+    fill.style.background = strengths[idx].color;
+    text.textContent = password.length > 0 ? strengths[idx].text : '';
 }
 
-function pwStr(){
-  const p=document.getElementById('sP').value,bar=document.getElementById('PWF'),lbl=document.getElementById('PWL');
-  let sc=0; if(p.length>=8)sc++; if(/[A-Z]/.test(p))sc++; if(/[0-9]/.test(p))sc++;
-  const L=[{w:'0%',c:'red',t:''},{w:'33%',c:'red',t:'Faible'},{w:'66%',c:'orange',t:'Moyen'},{w:'100%',c:'green',t:'Fort'}];
-  const l=L[sc]; bar.style.width=l.w; bar.style.background=l.c; lbl.textContent=l.t;
+// ==================================================
+// TOGGLE MOT DE PASSE
+// ==================================================
+function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+    }
 }
 
-// CONNEXION
-async function doLogin(){
-  const email = document.getElementById('lE').value, pass = document.getElementById('lP').value;
-  if(!email || !pass) return showM('lM', 'Champs requis', 'e');
-  
-  const b = document.getElementById('lB'); b.disabled = true; b.innerHTML = '<span class="sp"></span>';
-  
-  const {ok, data} = await sbAuth('token?grant_type=password', {email, password:pass});
-  if(!ok) { showM('lM', "Erreur de connexion", 'e'); b.disabled = false; b.textContent = "Entrer dans la galaxie"; }
-  else {
-    saveSession(data, email);
-    alertLogSnag('Connexion', 'activite', email + ' est en ligne', '🛰️');
-    showSuccess(email);
-  }
-}
-
-// INSCRIPTION
-async function doSignup(){
-  const email = document.getElementById('sE').value, pass = document.getElementById('sP').value;
-  if(!email || pass.length < 8) return showM('sM', 'Données invalides', 'e');
-  
-  const b = document.getElementById('sB'); b.disabled = true;
-  const {ok, data} = await sbAuth('signup', {email, password:pass});
-  if(!ok) { showM('sM', "Erreur", 'e'); b.disabled = false; }
-  else {
-    alertLogSnag('Inscription', 'utilisateurs', email, '🚀');
-    document.getElementById('OE').textContent = email;
-    document.getElementById('pS').style.display = 'none';
-    document.getElementById('TABS').style.display = 'none';
-    document.getElementById('OTP').classList.add('on');
-  }
-}
-
-// OTP
-async function doOTP(){
-  const token = Array.from(document.querySelectorAll('.box')).map(i => i.value).join('');
-  const email = document.getElementById('OE').textContent;
-  
-  const {ok, data} = await sbAuth('verify', {type:'email', email, token});
-  if(!ok) { showM('oM', "Code incorrect", 'e'); }
-  else {
-    vibe('success');
-    showSuccess(email);
-  }
-}
-
-function showSuccess(email) {
-  document.getElementById('SEML').textContent = email;
-  document.getElementById('SOV').classList.add('on');
-  setTimeout(() => document.getElementById('SBF').style.width = '100%', 100);
-  setTimeout(() => {
-    document.getElementById('SOV').classList.remove('on');
-    document.querySelector('.scene').style.display = 'none';
-    document.getElementById('DASH').classList.add('on');
-    document.getElementById('D_EMAIL').textContent = email;
-    loadStats();
-  }, 2500);
-}
-
-// CANVAS ÉTOILES
-!function(){
-  const c=document.getElementById('cv'),x=c.getContext('2d');let ST=[];
-  const rz=()=>{c.width=innerWidth;c.height=innerHeight;ST=[];for(let i=0;i<200;i++)ST.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.5,o:Math.random()})};
-  rz();addEventListener('resize',rz);
-  !function draw(){x.clearRect(0,0,c.width,c.height);ST.forEach(s=>{x.fillStyle=`rgba(255,255,255,${Math.abs(Math.sin(Date.now()*0.001+s.o))})`;x.beginPath();x.arc(s.x,s.y,s.r,0,Math.PI*2);x.fill()});requestAnimationFrame(draw)}();
-}();
-
-// AUTO-FOCUS OTP
-document.querySelectorAll('.box').forEach((b,i,a)=>{
-  b.oninput=()=>{if(b.value && i<5) a[i+1].focus()};
-  b.onkeydown=(e)=>{if(e.key==='Backspace' && !b.value && i>0) a[i-1].focus()};
+// ==================================================
+// TABS
+// ==================================================
+document.querySelectorAll('.auth-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        const target = tab.dataset.tab;
+        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        document.getElementById('loginPanel').style.display = target === 'login' ? 'block' : 'none';
+        document.getElementById('registerPanel').style.display = target === 'register' ? 'block' : 'none';
+        
+        hideMessage('loginMessage');
+        hideMessage('regMessage');
+    });
 });
 
-// SESSION EXISTANTE
-window.onload = () => {
-  const t = localStorage.getItem('gi_token');
-  if(t) showSuccess(localStorage.getItem('gi_email'));
+// ==================================================
+// NAVIGATION BOTTOM
+// ==================================================
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+        vibrate(30);
+    });
+});
+
+// ==================================================
+// API CALLS
+// ==================================================
+async function callSupabase(endpoint, body) {
+    const response = await fetch(`${SUPABASE_URL}/auth/v1/${endpoint}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_KEY
+        },
+        body: JSON.stringify(body)
+    });
+    const data = await response.json();
+    return { ok: response.ok && !data.error, data };
 }
+
+// ==================================================
+// INSCRIPTION
+// ==================================================
+async function handleRegister() {
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const confirm = document.getElementById('regConfirm').value;
+    const referral = document.getElementById('regReferral').value.trim();
+    
+    if (!email || !password) {
+        showMessage('regMessage', '⚠️ Tous les champs sont requis', 'error');
+        vibrate(100);
+        return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showMessage('regMessage', '⚠️ E-mail invalide', 'error');
+        vibrate(100);
+        return;
+    }
+    if (password.length < 8) {
+        showMessage('regMessage', '⚠️ Mot de passe : 8 caractères minimum', 'error');
+        vibrate(100);
+        return;
+    }
+    if (password !== confirm) {
+        showMessage('regMessage', '⚠️ Les mots de passe ne correspondent pas', 'error');
+        vibrate(100);
+        return;
+    }
+    
+    const btn = document.getElementById('registerBtn');
+    btn.disabled = true;
+    btn.textContent = 'CRÉATION...';
+    
+    try {
+        const { ok, data } = await callSupabase('signup', {
+            email,
+            password,
+            options: {
+                data: { referral_code: referral || null }
+            }
+        });
+        
+        if (!ok) {
+            showMessage('regMessage', data.message || '❌ Erreur lors de l\'inscription', 'error');
+            vibrate(100);
+        } else {
+            playBeep('success');
+            showMessage('regMessage', '✅ Compte créé ! Code envoyé à ' + email, 'success');
+            logSnag('Nouvelle inscription', 'utilisateurs', email, '🚀');
+            currentEmail = email;
+            showOTPPanel(email);
+        }
+    } catch (error) {
+        showMessage('regMessage', '❌ Erreur réseau', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'CRÉER MON COMPTE';
+    }
+}
+
+// ==================================================
+// CONNEXION
+// ==================================================
+async function handleLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    
+    if (!email || !password) {
+        showMessage('loginMessage', '⚠️ E-mail et mot de passe requis', 'error');
+        vibrate(100);
+        return;
+    }
+    
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = true;
+    btn.textContent = 'CONNEXION...';
+    
+    try {
+        const { ok, data } = await callSupabase('token?grant_type=password', {
+            email,
+            password
+        });
+        
+        if (!ok) {
+            showMessage('loginMessage', data.message || '❌ E-mail ou mot de passe incorrect', 'error');
+            vibrate(100);
+        } else {
+            playBeep('success');
+            localStorage.setItem('gi_token', data.access_token);
+            localStorage.setItem('gi_email', email);
+            logSnag('Connexion réussie', 'activite', email + ' est en ligne', '🛰️');
+            showSuccessAndDashboard(email);
+        }
+    } catch (error) {
+        showMessage('loginMessage', '❌ Erreur réseau', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'ENTRER DANS LA GALAXIE';
+    }
+}
+
+// ==================================================
+// OTP
+// ==================================================
+function showOTPPanel(email) {
+    document.getElementById('otpEmail').textContent = email;
+    document.getElementById('loginPanel').style.display = 'none';
+    document.getElementById('registerPanel').style.display = 'none';
+    document.getElementById('otpPanel').classList.add('active');
+    
+    // Reset OTP boxes
+    const boxes = document.querySelectorAll('.otp-box');
+    boxes.forEach(box => {
+        box.value = '';
+        box.classList.remove('filled');
+    });
+    if (boxes[0]) boxes[0].focus();
+    
+    startExpiryTimer(600); // 10 minutes
+}
+
+function startExpiryTimer(seconds) {
+    expiryEnd = Date.now() + seconds * 1000;
+    const bar = document.getElementById('expiryBar');
+    
+    if (otpTimer) clearInterval(otpTimer);
+    otpTimer = setInterval(() => {
+        const remaining = Math.max(0, expiryEnd - Date.now());
+        const percent = (remaining / (seconds * 1000)) * 100;
+        bar.style.width = percent + '%';
+        
+        if (remaining <= 0) {
+            clearInterval(otpTimer);
+            bar.style.width = '0%';
+            showMessage('otpMessage', '⏰ Code expiré. Cliquez sur Renvoyer.', 'error');
+        }
+    }, 500);
+}
+
+async function verifyOTP() {
+    const boxes = document.querySelectorAll('.otp-box');
+    const token = Array.from(boxes).map(b => b.value).join('');
+    
+    if (token.length !== 6) {
+        showMessage('otpMessage', '⚠️ Entrez les 6 chiffres', 'error');
+        vibrate(100);
+        return;
+    }
+    
+    const btn = document.querySelector('#otpPanel .btn-primary');
+    btn.disabled = true;
+    btn.textContent = 'VÉRIFICATION...';
+    
+    try {
+        const { ok, data } = await callSupabase('verify', {
+            type: 'email',
+            email: currentEmail,
+            token: token
+        });
+        
+        if (!ok) {
+            showMessage('otpMessage', data.message || '❌ Code invalide', 'error');
+            vibrate(100);
+            boxes.forEach(b => b.classList.add('bad'));
+            setTimeout(() => boxes.forEach(b => b.classList.remove('bad')), 500);
+        } else {
+            playBeep('success');
+            showMessage('otpMessage', '✅ Compte activé avec succès !', 'success');
+            if (data.access_token) {
+                localStorage.setItem('gi_token', data.access_token);
+                localStorage.setItem('gi_email', currentEmail);
+            }
+            setTimeout(() => showSuccessAndDashboard(currentEmail), 1000);
+        }
+    } catch (error) {
+        showMessage('otpMessage', '❌ Erreur réseau', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'VALIDER LE CODE';
+    }
+}
+
+async function resendOTP() {
+    showMessage('otpMessage', '📡 Nouveau code envoyé...', 'info');
+    
+    try {
+        const { ok } = await callSupabase('resend', {
+            type: 'signup',
+            email: currentEmail
+        });
+        
+        if (ok) {
+            startExpiryTimer(600);
+            showMessage('otpMessage', '✅ Nouveau code envoyé à ' + currentEmail, 'success');
+            vibrate(50);
+        } else {
+            showMessage('otpMessage', '❌ Trop de demandes. Attendez.', 'error');
+        }
+    } catch (error) {
+        showMessage('otpMessage', '❌ Erreur', 'error');
+    }
+}
+
+// ==================================================
+// DASHBOARD
+// ==================================================
+function showSuccessAndDashboard(email) {
+    const dash = document.getElementById('dashboard');
+    const authScene = document.getElementById('authScene');
+    
+    // Mettre à jour les infos dashboard
+    document.getElementById('dashEmail').textContent = email;
+    document.getElementById('statBalance').textContent = '5.00 €';
+    document.getElementById('statProfit').textContent = '0.00 €';
+    document.getElementById('statReferrals').textContent = '0';
+    document.getElementById('statRank').textContent = 'Recrue';
+    
+    // Simuler des pilotes en ligne aléatoires
+    setInterval(() => {
+        const online = Math.floor(Math.random() * 500) + 1000;
+        document.getElementById('pilotsCount').textContent = online.toLocaleString();
+    }, 30000);
+    
+    authScene.style.display = 'none';
+    dash.classList.add('active');
+    vibrate(100);
+    playBeep('success');
+}
+
+function handleLogout() {
+    localStorage.removeItem('gi_token');
+    localStorage.removeItem('gi_email');
+    
+    const dash = document.getElementById('dashboard');
+    const authScene = document.getElementById('authScene');
+    
+    dash.classList.remove('active');
+    authScene.style.display = 'flex';
+    
+    // Reset forms
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('regEmail').value = '';
+    document.getElementById('regPassword').value = '';
+    document.getElementById('regConfirm').value = '';
+    document.getElementById('regReferral').value = '';
+    
+    // Reset tabs
+    document.querySelector('.auth-tab[data-tab="login"]').click();
+    
+    showMessage('loginMessage', '🔒 Déconnecté avec succès', 'info');
+    vibrate(50);
+}
+
+// ==================================================
+// CANVAS ÉTOILES
+// ==================================================
+const canvas = document.getElementById('starCanvas');
+const ctx = canvas.getContext('2d');
+let stars = [];
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    initStars();
+}
+
+function initStars() {
+    stars = [];
+    const count = Math.floor(canvas.width * canvas.height / 2500);
+    for (let i = 0; i < count; i++) {
+        stars.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            radius: Math.random() * 1.5 + 0.5,
+            alpha: Math.random() * 0.6 + 0.2,
+            speed: Math.random() * 0.3 + 0.1
+        });
+    }
+}
+
+function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let star of stars) {
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 235, 185, ${star.alpha * 0.8})`;
+        ctx.fill();
+        
+        // Animation douce
+        star.alpha += (Math.random() - 0.5) * 0.02;
+        star.alpha = Math.min(0.8, Math.max(0.2, star.alpha));
+    }
+    requestAnimationFrame(drawStars);
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+initStars();
+drawStars();
+
+// ==================================================
+// VÉRIFICATION SESSION EXISTANTE
+// ==================================================
+const savedToken = localStorage.getItem('gi_token');
+const savedEmail = localStorage.getItem('gi_email');
+if (savedToken && savedEmail) {
+    showSuccessAndDashboard(savedEmail);
+}
+
+// ==================================================
+// OTP BOXES NAVIGATION
+// ==================================================
+const otpBoxes = document.querySelectorAll('.otp-box');
+otpBoxes.forEach((box, idx) => {
+    box.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '');
+        if (e.target.value && idx < 5) {
+            otpBoxes[idx + 1].focus();
+        }
+    });
+    
+    box.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !box.value && idx > 0) {
+            otpBoxes[idx - 1].focus();
+        }
+    });
+});
+
+// ==================================================
+// ENTER KEY
+// ==================================================
+document.getElementById('loginPassword').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') handleLogin();
+});
+document.getElementById('regConfirm').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') handleRegister();
+});
+
+console.log('🚀 Galaxy Investor - Plateforme d\'investissement spatiale');
 </script>
 </body>
 </html>
